@@ -1,0 +1,104 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<USNStarterKit.USNModels.USNNewsletterFormViewModel>
+
+@using USNStarterKit.USNHeading.Models;
+	
+@using (Ajax.BeginForm("HandleNewsletterSubmit", "USNNewsletterSignupSurface", new AjaxOptions
+{
+    HttpMethod = "POST",
+    InsertionMode = InsertionMode.Replace,
+    UpdateTargetId = "NewsletterSignupContainer" + @Model.CurrentNodeID,
+    LoadingElementId = "NewsletterAjaxLoading" + @Model.CurrentNodeID
+}))
+{
+    var currentNode = Umbraco.TypedContent(Model.CurrentNodeID);
+    var currentPage = Umbraco.TypedContent(Model.ActualPageID);
+
+    IPublishedContent homeNode = currentPage.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var globalSettings = settingsFolder.Children.Where(x => x.IsDocumentType("USNGlobalSettings")).First();
+
+    var containerID = "NewsletterSignupContainer" + Model.CurrentNodeID;
+    var errorID = "NewsletterError" + Model.CurrentNodeID;
+    var ajaxLoadingID = "NewsletterAjaxLoading" + Model.CurrentNodeID;
+
+    if (globalSettings.HasValue("campaignMonitorAPIKey") && (currentNode.HasValue("campaignMonitorSubscriberListID") || globalSettings.HasValue("defaultCampaignMonitorSubscriberListID")))
+    {
+        if (Model.PageType == "advanced")
+        {
+            @Html.Raw("<section class=\"content advanced-component standard-components\"><div class=\"container\"><div class=\"row\"><div id=\"mid_col\" class=\"col-md-8 col-md-offset-2 col-xs-12\" role=\"main\">")
+        }
+
+        @Html.Hidden("CurrentNodeID", Model.CurrentNodeID)
+        @Html.Hidden("ActualPageID", Model.ActualPageID)
+        @Html.AntiForgeryToken()
+        <div class="newsletter ajax_wrap panel panel-default">
+            <div class="panel-body">
+
+                @if (currentNode.HasValue("newsletterHeading"))
+                {
+                    var newsletterHeading = currentNode.GetPropertyValue<USNHeading>("newsletterHeading");
+
+                    if (newsletterHeading != null && !String.IsNullOrEmpty(newsletterHeading.Heading))
+                    {
+                        @Html.Raw("<" + newsletterHeading.HeadingStyle + " class=\"heading main\"><span class=\"underline\">")
+                        @newsletterHeading.Heading
+                        @Html.Raw("</span></" + newsletterHeading.HeadingStyle + ">")
+                    }
+                    else if (currentNode.GetProperty("newsletterHeading").Value != String.Empty)
+                    { 
+                        <p class="heading"><span class="underline">@currentNode.GetProperty("newsletterHeading").Value</span></p>
+                    }
+                }
+
+                @if (currentNode.HasValue("newsletterIntroduction"))
+                {
+                    @Html.Raw(currentNode.GetProperty("newsletterIntroduction").Value)
+                }
+                <div id="@containerID">
+                    <div class="alert alert-danger alert-dismissible fade in" id="@errorID" style="display:none">
+                    </div>
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="FirstName" class="control-label">
+                                @umbraco.library.GetDictionaryItem("USN Form First Name Label") <em class="req">*</em>
+                            </label>
+                            @Html.TextBoxFor(x => Model.FirstName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => Model.FirstName, @umbraco.library.GetDictionaryItem("USN Form First Name Validation"))
+                        </div>
+                        <div class="form-group">
+                            <label for="LastName" class="control-label">
+                                @umbraco.library.GetDictionaryItem("USN Form Last Name Label") <em class="req">*</em>
+                            </label>
+                            @Html.TextBoxFor(x => Model.LastName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(x => Model.LastName, @umbraco.library.GetDictionaryItem("USN Form Last Name Validation"))
+                        </div>
+                        <div class="form-group">
+                            <label for="Email" class="control-label">
+                                @umbraco.library.GetDictionaryItem("USN Form Email Address Label") <em class="req">*</em>
+                            </label>
+                            @Html.TextBoxFor(x => Model.Email, new { autocapitalize = "off", @class = "form-control" })
+                            @Html.ValidationMessageFor(x => Model.Email, @umbraco.library.GetDictionaryItem("USN Form Email Address Validation"))
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <button class="btn btn-primary" type="submit">
+                            <span>@currentNode.GetProperty("newsletterButtonText").Value</span>
+                        </button>
+                    </fieldset>
+                    <div class="ajax_loading" id="@ajaxLoadingID" style="display:none">
+                        <div class="loading">
+                            <span class="message">@umbraco.library.GetDictionaryItem("USN Newsletter Form Sending Message")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Close container for page components on advanced page *@
+        if (Model.PageType == "advanced")
+        {
+            @Html.Raw("</div></div></div></section>")
+        }
+
+    }
+}

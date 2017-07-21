@@ -1,0 +1,145 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{
+    IPublishedContent homeNode = Model.Content.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var globalSettings = settingsFolder.Children.Where(x => x.IsDocumentType("USNGlobalSettings")).First();
+
+    if (!Model.Content.GetPropertyValue<Boolean>("hideHeaderImageSection") && !Model.Content.IsDocumentType("USNHomepage") &&
+        ((Model.Content.GetPropertyValue<Boolean>("overrideDefaultHeaderImageSection") && (Model.Content.HasValue("headerBackgroundImage") && Umbraco.TypedMedia(Model.Content.GetProperty("headerBackgroundImage").Value) != null)) || (!Model.Content.GetPropertyValue<Boolean>("overrideDefaultHeaderImageSection") && (globalSettings.HasValue("defaultHeaderBackgroundImage") && Umbraco.TypedMedia(globalSettings.GetProperty("defaultHeaderBackgroundImage").Value) != null)))) 
+    {
+        string backgroundImage = "";
+        string altText = "";
+        string textAlignment = "text-left";
+        string itemBackground = "";
+
+        if (Model.Content.GetPropertyValue<Boolean>("overrideDefaultHeaderImageSection") && (Model.Content.HasValue("headerBackgroundImage") && Umbraco.TypedMedia(Model.Content.GetProperty("headerBackgroundImage").Value) != null))
+        {
+            backgroundImage = Umbraco.TypedMedia(Model.Content.GetProperty("headerBackgroundImage").Value).GetCropUrl(width: 1900, height: 100);
+            altText = Model.Content.GetProperty("headerBackgroundImageAltText").Value.ToString();
+
+            if (Model.Content.HasValue("textAlignmentheaderTextAlignment"))
+            {
+                switch (Model.Content.GetProperty("textAlignmentheaderTextAlignment").Value.ToString())
+                {
+                    case "Left":
+                        textAlignment = "text-left";
+                        break;
+                    case "Center":
+                        textAlignment = "col-lg-offset-3 col-md-offset-2 text-center";
+                        break;
+                    case "Right":
+                        textAlignment = "text-right pull-right";
+                        break;
+                    default:
+                        textAlignment = "text-left";
+                        break;
+                }
+            }
+
+            if (Model.Content.HasValue("textColourScheme"))
+            {
+                switch (Model.Content.GetProperty("textColourScheme").Value.ToString())
+                {
+                    case "Light":
+                        itemBackground = "dark_bg";
+                        break;
+                    default:
+                        itemBackground = "";
+                        break;
+                }
+            }
+        }
+        else if (globalSettings.HasValue("defaultHeaderBackgroundImage") && Umbraco.TypedMedia(globalSettings.GetProperty("defaultHeaderBackgroundImage").Value) != null)
+        {
+            backgroundImage = Umbraco.TypedMedia(globalSettings.GetProperty("defaultHeaderBackgroundImage").Value).GetCropUrl(width: 1900, height: 100);
+            altText = globalSettings.GetProperty("defaultHeaderBackgroundImageAltText").Value.ToString();
+
+            if (globalSettings.HasValue("defaultHeaderTextAlignment"))
+            {
+                switch (globalSettings.GetProperty("defaultHeaderTextAlignment").Value.ToString())
+                {
+                    case "Left":
+                        textAlignment = "text-left";
+                        break;
+                    case "Center":
+                        textAlignment = "col-lg-offset-3 col-md-offset-2 text-center";
+                        break;
+                    case "Right":
+                        textAlignment = "text-right pull-right";
+                        break;
+                    default:
+                        textAlignment = "text-left";
+                        break;
+                }
+            }
+
+            if (globalSettings.HasValue("defaultTextColourScheme"))
+            {
+                switch (globalSettings.GetProperty("defaultTextColourScheme").Value.ToString())
+                {
+                    case "Light":
+                        itemBackground = "dark_bg";
+                        break;
+                    default:
+                        itemBackground = "";
+                        break;
+                }
+            }
+            
+        }
+
+	    <!-- BANNER -->
+        <section class="advanced-component banner">
+
+            <div class="item @itemBackground">
+
+                <div class="image">
+                    <img src="@backgroundImage" alt="@altText">
+                </div>
+
+                <div class="info os-animation" data-os-animation="fadeInUp" data-os-animation-delay="0.1s">
+                    <div class="container valign">
+
+                        <!-- ROW -->
+                        <div class="row">
+
+                            <div class="col-lg-12 col-md-12 col-xs-12 @textAlignment">
+                                @if (Model.Content.IsDocumentType("USNBlogLandingPage"))
+                                {
+                                    string catID = Request.QueryString["category"];
+
+                                    if (String.IsNullOrEmpty(catID))
+                                    {
+                                        <h1 class="heading"><span class="underline">@Umbraco.Field("onPageTitle", altFieldAlias: "pageName")</span></h1>
+                                    }
+                                    else
+                                    {
+                                        var catPage = Umbraco.TypedContent(Convert.ToInt32(catID));
+                                        if (catPage.HasValue("categoryPageTitle"))
+                                        {
+                                            <h1 class="heading"><span class="underline">@catPage.GetProperty("categoryPageTitle").Value</span></h1>
+                                        }
+                                        else
+                                        {
+                                            <h1 class="heading"><span class="underline">@catPage.Name</span></h1>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <h1 class="heading"><span class="underline">@Umbraco.Field("onPageTitle", altFieldAlias: "pageName")</span></h1>
+                                }
+
+                            </div>
+                        </div>
+                        <!--// ROW -->
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+	<!--// BANNER -->
+    }
+}

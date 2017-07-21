@@ -1,0 +1,76 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+    string pageType = ViewData["pageType"].ToString();
+
+    if (Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_ResourceItem")).Count() > 0)
+    {
+        <!-- COMPONENT ANCHOR -->
+        <a id="pos_@Model.Content.Id"></a>
+        <!--// COMPONENT ANCHOR -->
+
+        @* Add container for page components on advanced page *@
+        if (pageType == "advanced")
+        {
+        	@Html.Raw("<section class=\"content advanced-component standard-components\"><div class=\"container\"><div class=\"row\"><div id=\"mid_col\" class=\"col-md-8 col-md-offset-2 col-xs-12\" role=\"main\">")
+        }
+
+		<!-- PAGE COMPONENT RESOURCES -->
+        <div class="page_component resources">
+            <div class="list-group">
+                @foreach (var item in Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_ResourceItem")).OrderBy("SortOrder"))
+                {
+                    string note = "";
+                    string iconClass = "";
+
+                    LinkInfo attachement = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(item.GetPropertyValue<UrlPicker>("attachement"));
+
+                    if (attachement != null)
+                    {
+                        switch (attachement.LinkType)
+                        {
+                            case UrlPicker.UrlPickerTypes.Url:
+                                iconClass = "fa fa-external-link pull-right after highlight";
+                                note = umbraco.library.GetDictionaryItem("USN Resources Component External Web Link") + " - " + attachement.LinkURL;
+                                break;
+                            case UrlPicker.UrlPickerTypes.Content:
+                                iconClass = "fa fa-chain pull-right after highlight";
+                                break;
+                            case UrlPicker.UrlPickerTypes.Media:
+                                iconClass = "fa fa-download pull-right after highlight";
+                                string fullPathU = Server.MapPath("/") + attachement.LinkURL;
+                                FileInfo finfoU = new FileInfo(fullPathU);
+                                long fileInMBU = finfoU.Length / 1024;
+
+                                string fileSizeU = fileInMBU.ToString() + "KB";
+                                note = umbraco.library.GetDictionaryItem("USN Resources Component File Size") + ": " + fileSizeU;
+                                break;
+                        }
+                        <a href="@attachement.LinkURL" @Html.Raw(attachement.LinkTitle) @Html.Raw(attachement.LinkTarget) class="item list-group-item">
+                            <p class="heading list-group-item-heading">@item.Name<i class="@iconClass"></i></p>
+
+                            @if (item.HasValue("optionalAdditionalInformation"))
+                            {
+                                <div class="text list-group-item-text">@Html.Raw(item.GetProperty("optionalAdditionalInformation").Value)</div>
+                            }
+
+                            @if (note != String.Empty)
+                            {
+                                <div class="size">@note</div>
+                            }
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+    
+        @* Close container for page components on advanced page *@
+        if (pageType == "advanced")
+        {
+            @Html.Raw("</div></div></div></section>")
+        }
+    }
+	<!--// PAGE COMPONENT RESOURCES -->
+}

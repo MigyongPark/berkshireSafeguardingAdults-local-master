@@ -1,0 +1,46 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{
+    string pageType = ViewData["pageType"].ToString();
+
+    if (Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_SlideshowImage")).Count() > 0)
+    {
+        <!-- COMPONENT ANCHOR -->
+        <a id="pos_@Model.Content.Id"></a>
+        <!--// COMPONENT ANCHOR -->
+    
+        @* Add container for page components on advanced page *@
+        if (pageType == "advanced")
+        {
+            @Html.Raw("<section class=\"content advanced-component standard-components\"><div class=\"container\"><div class=\"row\"><div id=\"mid_col\" class=\"col-md-8 col-md-offset-2 col-xs-12\" role=\"main\">")
+        }
+
+        <!-- PAGE COMPONENT SLIDESHOW -->
+        <div class="page_component slideshow">
+            @foreach (var slideshowItem in Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_SlideshowImage")).OrderBy("SortOrder"))
+            {
+                if (slideshowItem.HasValue("slideshowImage") && Umbraco.TypedMedia(slideshowItem.GetProperty("slideshowImage").Value) != null)
+                {
+                    <div class="item">
+                        <div class="image">
+                            <img src="@Umbraco.TypedMedia(slideshowItem.GetProperty("slideshowImage").Value).GetCropUrl(width: 1140, height: 550)" alt="@slideshowItem.GetProperty("slideshowImageAltText").Value">
+                        </div>
+                        @if (slideshowItem.HasValue("slideshowImageCaption"))
+                        {
+                        <div class="info">
+                            <div class="text">@slideshowItem.GetProperty("slideshowImageCaption").Value</div>
+                        </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+        <!--// PAGE COMPONENT SLIDESHOW -->
+    
+        @* Close container for page components on advanced page *@
+        if (pageType == "advanced")
+        {
+            @Html.Raw("</div></div></div></section>")
+        }
+    }
+}

@@ -1,0 +1,75 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+<section class="content advanced-component promo_pods">
+    <div class="container">
+        <div class="row">
+            <div class="item col-md-4 col-sm-6 col-xs-12 odd">
+                <a href="procedures/">
+
+                    <p class="heading firstPod">Procedures</p>
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 even">
+                <a href="new-updated/">
+
+                    <p class="heading">New & Updated Procedures</p>
+
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 odd">
+                <a href="reporting-concerns/">
+
+                    <p class="heading">Reporting Concerns</p>
+
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 even">
+                <a href="amendments/">
+
+                    <p class="heading">Amendments</p>
+
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 odd">
+
+				
+
+               
+		@switch (Umbraco.Field("pageName").ToString())
+            {
+                case "Bracknell":
+						<a href="http://www.bflscb.org.uk/" target="_blank">                    
+							<p class=" heading">Local Safeguarding Children Board</p>
+						</a>
+                    break;
+                case "Reading":
+						<a href="http://www.readinglscb.org.uk/" target="_blank">                    
+							<p class=" heading">Local Safeguarding Children Board</p>
+						</a>
+                    break;
+                case "Slough":
+						<a href="http://www.slough.gov.uk/council/strategies-plans-and-policies/slough-local-safeguarding-children-s-board.aspx/" target="_blank">                    
+							<p class=" heading">Local Safeguarding Children Board</p>
+						</a>
+                    break;
+                case "West Berkshire":
+						<a href="http://www.westberkslscb.org.uk/" target="_blank">                    
+							<p class=" heading">Local Safeguarding Children Board</p>
+						</a>
+                    break;
+                case "Windsor & Maidenhead":
+						<a href="https://www.wamlscb.org/" target="_blank">                    
+							<p class=" heading">Local Safeguarding Children Board</p>
+						</a>
+                    break;
+                case "Wokingham":
+						<a href="http://www.wokinghamlscb.org.uk/" target="_blank">                    
+							<p class=" heading">Local Safeguarding Children Board</p>
+						</a>
+                    break;
+				
+			}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

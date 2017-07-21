@@ -1,0 +1,134 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNHelpers;
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+    string pageType = ViewData["pageType"].ToString();
+    
+    <!-- COMPONENT ANCHOR -->
+    <a id="pos_@Model.Content.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    @* Add container for page components on advanced page *@
+    if (pageType == "advanced")
+    {
+        @Html.Raw("<section class=\"content advanced-component standard-components\"><div class=\"container\"><div class=\"row\"><div id=\"mid_col\" class=\"col-md-8 col-md-offset-2 col-xs-12\" role=\"main\">")
+    }
+
+    <!-- PAGE COMPONENT GALLERY -->
+    <div class="row page_component gallery">
+        @foreach (var galleryItem in Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_GalleryImage") || x.IsDocumentType("USN_SC_GalleryVideo")).OrderBy("SortOrder"))
+        {
+            string lightWindow = "";
+            string title = "";
+
+            if (galleryItem.IsDocumentType("USN_SC_GalleryImage"))
+            {
+                if (!galleryItem.GetPropertyValue<bool>("tickToDisableLightWindow"))
+                {
+                    lightWindow = " data-toggle=\"lightbox\" data-type=\"image\" data-gallery=\"galleryname-" + Model.Content.Id + "\"";
+
+                    if (galleryItem.HasValue("lightwindowText"))
+                    {
+                        title = "data-title=\"" + galleryItem.GetProperty("lightwindowText").Value.ToString() + "\"";
+                    }
+                }
+
+                if (galleryItem.HasValue("lightWindowImage") && Umbraco.TypedMedia(galleryItem.GetProperty("lightWindowImage").Value) != null)
+                {
+
+                    string linkURL = String.Empty;
+                    string linkTitle = String.Empty;
+                    string linkTarget = String.Empty;
+
+                    if (galleryItem.GetPropertyValue<bool>("tickToDisableLightWindow") && galleryItem.HasValue("imageLink"))
+                    {
+                        LinkInfo imageLink = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(galleryItem.GetPropertyValue<UrlPicker>("imageLink"));
+                        
+                        if(imageLink != null)
+                        { 
+                            linkURL = imageLink.LinkURL;
+                            linkTitle = imageLink.LinkTitle;
+                            linkTarget = imageLink.LinkTarget; 
+                        }
+                    }
+                    else
+                    {
+                        linkURL = Umbraco.TypedMedia(galleryItem.GetProperty("lightWindowImage").Value).Url;
+                    }
+
+                    <div class="item col-md-4 col-xs-6">
+                        <div class="image">
+                            @if (linkURL != String.Empty)
+                            {
+                                @Html.Raw("<a href=\"" + linkURL + "\" " + title + " target=\"" + linkTarget + "\" " + lightWindow + " >")
+                            }
+                            <img src="@Umbraco.TypedMedia(galleryItem.GetProperty("lightWindowImage").Value).GetCropUrl(width: 345, height: 260)" alt="@galleryItem.GetProperty("thumbnailImageAltText").Value">
+                            @if (lightWindow != String.Empty)
+                            {
+                                <div class="overlayicon"><i class="fa fa-expand"></i></div>
+                            }
+                            else if (linkURL != String.Empty && linkTarget != String.Empty)
+                            {
+                            <div class="overlayicon"><i class="fa fa-external-link"></i></div>
+                            }
+                            else if (linkURL != String.Empty && linkTarget == String.Empty)
+                            {
+                            <div class="overlayicon"><i class="fa fa fa-chain"></i></div>
+                            }
+                            @if (linkURL != String.Empty)
+                            {
+                                @Html.Raw("</a>")
+                            }
+                        </div>
+                    </div>
+                }
+            }
+
+            else
+            {
+                if (galleryItem.HasValue("galleryVideo"))
+                {
+                    string videoURLOriginal = galleryItem.GetProperty("galleryVideo").Value.ToString().Trim();
+
+                    if (galleryItem.HasValue("lightwindowText"))
+                    {
+                        title = "data-title=\"" + galleryItem.GetProperty("lightwindowText").Value.ToString() + "\"";
+                    }
+
+                    string videoURLModified = "";
+                    string videoImage = "";
+                    string dataRemote = "";
+
+                    videoImage = USNVideoHelper.GetVideoInfo(videoURLOriginal, out videoURLModified, out dataRemote);
+
+                    if (galleryItem.HasValue("galleryThumbnailImage") && Umbraco.TypedMedia(galleryItem.GetProperty("galleryThumbnailImage").Value) != null)
+                    {
+                        videoImage = Umbraco.TypedMedia(galleryItem.GetProperty("galleryThumbnailImage").Value).GetCropUrl(width: 345, height: 260);
+                    }
+
+                    if(videoImage != String.Empty)
+                    { 
+                    <div class="item video col-md-4 col-xs-6">
+                        <div class="image">
+                            <a href="@videoURLModified" @Html.Raw(title) data-toggle="lightbox" @Html.Raw(dataRemote) data-gallery="galleryname-@Model.Content.Id">
+                                <img src="@videoImage" alt="@galleryItem.GetProperty("thumbnailImageAltText").Value">
+                                <div class="overlayicon"><i class="fa fa-play fa-3x"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                    }
+                }
+
+            }
+        }
+    </div>
+    <!--// PAGE COMPONENT GALLERY -->
+    
+    @* Close container for page components on advanced page *@
+    if (pageType == "advanced")
+    {
+        @Html.Raw("</div></div></div></section>")
+    }
+}

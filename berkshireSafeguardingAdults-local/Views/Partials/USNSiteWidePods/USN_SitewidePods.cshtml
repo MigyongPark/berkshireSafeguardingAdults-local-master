@@ -1,0 +1,105 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{
+    IPublishedContent homeNode = Model.Content.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var globalSettings = settingsFolder.Children.Where(x => x.IsDocumentType("USNGlobalSettings")).First();
+    
+    string podStyle = ViewData["podstyle"].ToString();
+    string pods = "";
+    string pageLayout = "";
+    string podContainerStyle = "";
+
+    if (Model.Content.HasProperty("pageLayout") && !Model.Content.HasValue("pageLayout") && globalSettings.HasValue("defaultPageLayout"))
+    {
+        pageLayout = globalSettings.GetProperty("defaultPageLayout").Value.ToString();
+    }
+    else if (Model.Content.HasProperty("pageLayout"))
+    {
+        pageLayout = Model.Content.GetProperty("pageLayout").Value.ToString();
+    }
+    else
+    {
+        pageLayout = "Content full width";
+    }
+
+    if ((podStyle == "verticle" && pageLayout != "Content full width") || (podStyle == "horizontal" && pageLayout == "Content full width"))
+    {
+
+        if (Model.Content.GetPropertyValue<bool>("overrideDefaultPods"))
+        {
+            if (Model.Content.HasValue("pagePods") && Model.Content.HasValue("pagePods"))
+            {
+                pods = Model.Content.GetProperty("pagePods").Value.ToString();
+            }
+        }
+        else
+        {
+            if (globalSettings.HasValue("defaultSitewidePods"))
+            {
+                pods = globalSettings.GetProperty("defaultSitewidePods").Value.ToString();
+            }
+        }
+
+        if (pods.Trim() != String.Empty)
+        {
+            if (podStyle == "horizontal")
+            {
+                podContainerStyle = "wide";
+                @Html.Raw("<section class=\"content\"><div class=\"container\"><div class=\"row\">")
+            }
+        
+            <div class="promo_pods @podContainerStyle">
+                @foreach (var pod in Umbraco.TypedContent(pods.Split(',')))
+                {
+                    if(pod != null)
+                    { 
+                    
+                        string nodeTypeAlias = pod.DocumentTypeAlias;
+
+                        switch (nodeTypeAlias)
+                        {
+                            case "USN_SWP_GeneralPod":
+                                @Html.Partial("USNSiteWidePods/USN_SWP_GeneralPod", @pod, new ViewDataDictionary { { "podstyle", podStyle } })
+                                break;
+                            case "USN_SWP_ImagePod":
+                                @Html.Partial("USNSiteWidePods/USN_SWP_ImagePod", @pod, new ViewDataDictionary { { "podstyle", podStyle } })
+                                break;
+                            case "USN_SWP_VideoPod":
+                                @Html.Partial("USNSiteWidePods/USN_SWP_VideoPod", @pod, new ViewDataDictionary { { "podstyle", podStyle } })
+                                break;
+                            case "USN_SWP_CodePod":
+                                @Html.Partial("USNSiteWidePods/USN_SWP_CodePod", @pod, new ViewDataDictionary { { "podstyle", podStyle } })
+                                break;
+                            case "USN_SWP_ListingPod":
+                                @Html.Partial("USNSiteWidePods/USN_SWP_ListingPod", @pod, new ViewDataDictionary { { "podstyle", podStyle } })
+                                break;
+                            case "USN_SWP_BlockquotePod":
+                                @Html.Partial("USNSiteWidePods/USN_SWP_BlockquotePod", @pod, new ViewDataDictionary { { "podstyle", podStyle } })
+                                break;
+                            case "USN_SWP_NewsletterSignupPod":
+                                if (podStyle == "horizontal")
+                                {
+                                    @Html.Raw("<div class=\"col-lg-3 col-md-4 col-sm-6 col-xs-12\">");
+                                }
+                                <div class="item newsletterpod">
+                                    @Html.Action("Index", "USNNewsletterSignupSurface", new { NodeID = pod.Id, ActualPageID = Model.Content.Id })
+                                </div>
+                                if (podStyle == "horizontal")
+                                {
+                                    @Html.Raw("</div>");
+                                }
+                                break;
+                        }
+                    }
+
+                }
+            </div>
+    
+            if (podStyle == "horizontal")
+            { 
+                @Html.Raw("</div></div></section>")
+            }
+        }
+    }
+}

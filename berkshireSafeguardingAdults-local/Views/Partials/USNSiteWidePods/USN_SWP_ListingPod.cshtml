@@ -1,0 +1,114 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNHelpers;
+@using USNStarterKit.USNBlog;
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+    string podStyle = ViewData["podstyle"].ToString();
+
+    if (podStyle == "horizontal")
+    {
+        @Html.Raw("<div class=\"col-lg-3 col-md-4 col-sm-6 col-xs-12\">");
+    }
+
+    LinkInfo linkToListing = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(Model.Content.GetPropertyValue<UrlPicker>("linkToListing"));
+
+    if (linkToListing != null && Model.Content.HasValue("pagesToDisplay"))
+    {
+        int pagesDisplayCount = Convert.ToInt32(Model.Content.GetProperty("pagesToDisplay").Value);
+
+        if (linkToListing.LinkUmbracoNode.IsDocumentType("USNBlogLandingPage"))
+        {
+            IEnumerable<IPublishedContent> posts = USNPostService.Instance.GetPosts(linkToListing.LinkUmbracoNode);
+
+            var nodes = posts.Take(pagesDisplayCount).ToList();
+
+            if (nodes.Count() > 0)
+            {
+                <div class="item lists panel panel-default">
+                    <div class="panel-body">
+                        <div class="listing blog">
+                            @if (Model.Content.HasValue("podTitle"))
+                            {
+                                <p class="heading"><span class="underline">@Model.Content.GetProperty("podTitle").Value</span></p>
+                            }
+                           
+                            @foreach (var node in nodes)
+                            {
+                                <div class="item" itemscope itemtype="http://schema.org/BlogPosting">
+                                    <div class="info">
+                                        <a href="@node.Url" itemprop="url">
+                                            @{
+                                                string postName = "";
+
+                                                if (node.HasValue("onPageTitle"))
+                                                {
+                                                    postName = node.GetProperty("onPageTitle").Value.ToString();
+                                                }
+                                                else
+                                                {
+                                                    postName = node.Name;
+                                                }
+                                            }
+                                            <p class="heading" itemprop="name headline">
+                                                @postName
+                                            </p>
+                                        </a>
+                              
+                                    </div>
+                                    <div class="meta">
+                                        <div>
+                                            <time itemprop="datePublished"><span class="date">@node.GetProperty("postDate").Value.ToString().FormatDateTime("dd MMM yyyy")</span></time>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <a class="see_all" href="@linkToListing.LinkURL" @Html.Raw(linkToListing.LinkTarget) @Html.Raw(linkToListing.LinkTitle)>@linkToListing.LinkCaption@Html.Raw(linkToListing.LinkIcon)</a>
+                    </div>
+                </div>
+            }
+        }
+        else if (linkToListing.LinkUmbracoNode.Children.Where(x => x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")).Count() > 0)
+        {
+            <div class="item lists panel panel-default">
+                <div class="panel-body">
+                    <div class="listing section">
+                        @if (Model.Content.HasValue("podTitle"))
+                        {
+                            <p class="heading"><span class="underline">@Model.Content.GetProperty("podTitle").Value</span></p>
+                        }
+                      
+                        @foreach (var item in linkToListing.LinkUmbracoNode.Children.Where(x => x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")).OrderBy("SortOrder").Take(pagesDisplayCount))
+                        {
+                            <div class="item">
+                                <div class="info">
+                                    <a href="@item.Url">
+                                        <p class="heading">
+                                            @if (item.HasValue("subPageListingLinkText"))
+                                            {
+                                                @item.GetProperty("subPageListingLinkText").Value.ToString()
+                                            }
+                                            else
+                                            {
+                                                @item.Name
+                                            }
+                                        </p>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <a class="see_all" href="@linkToListing.LinkURL" @Html.Raw(linkToListing.LinkTarget) @Html.Raw(linkToListing.LinkTitle)>@linkToListing.LinkCaption@Html.Raw(linkToListing.LinkIcon)</a>
+                </div>
+            </div>
+        }
+    }
+
+    if (podStyle == "horizontal")
+    {
+        @Html.Raw("</div>");
+    }
+
+}

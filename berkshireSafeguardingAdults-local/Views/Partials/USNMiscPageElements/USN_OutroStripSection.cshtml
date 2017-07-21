@@ -1,0 +1,66 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+    IPublishedContent homeNode = Model.Content.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var globalSettings = settingsFolder.Children.Where(x => x.IsDocumentType("USNGlobalSettings")).First();
+    
+    string text = "";
+
+    LinkInfo outroLink; 
+
+    if(!Model.Content.GetPropertyValue<Boolean>("hideOutroStripSection"))
+    {
+        if (Model.Content.GetPropertyValue<Boolean>("overrideDefaultOutroStripSection"))
+        {
+            outroLink = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(Model.Content.GetPropertyValue<UrlPicker>("outroLink"));
+
+            if (Model.Content.HasValue("outroText"))
+            {
+                text = Model.Content.GetProperty("outroText").Value.ToString();
+            }
+        }
+        else
+        {
+            outroLink = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(globalSettings.GetPropertyValue<UrlPicker>("outroDefaultLink"));
+
+            if (globalSettings.HasValue("outroDefaultText"))
+            {
+                text = globalSettings.GetProperty("outroDefaultText").Value.ToString();
+            }
+        }
+
+        if (outroLink != null || text != String.Empty)
+        {
+        <section class="content advanced-component cta-strip" style="background-color:#CCCCCC;">
+            <div class="container">
+
+                <!-- ROW -->
+                <div class="row">
+                    @if (text != String.Empty)
+                    {
+                    <div class="col-md-9 col-xs-12">
+
+                        @Html.Raw(text)
+
+                    </div>
+                    }
+                    @if (outroLink != null)
+                    { 
+                    <div class="col-md-3 col-xs-12">
+
+                        <p class="link"><a class="btn btn-primary btn-block btn-lg" href="@outroLink.LinkURL" @Html.Raw(outroLink.LinkTarget) @Html.Raw(outroLink.LinkTitle)>@outroLink.LinkCaption@Html.Raw(outroLink.LinkIcon)</a></p>
+
+                    </div>
+                    }
+
+                </div>
+                <!--// ROW -->
+
+            </div>
+        </section>
+        }
+    }
+}

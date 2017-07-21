@@ -1,0 +1,65 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = "USNMaster.cshtml";
+}
+
+<!-- CONTENT -->
+<section class="content">
+<div class="container">
+		
+	<!-- ROW -->
+	<div class="row">
+			
+		<!-- CONTENT COL -->
+		@Html.Partial("USNLayout/USN_ContentColumnStyle",@Model.Content)
+				
+			@Html.Partial("USNMiscPageElements/USN_HeaderStandard", @Model.Content)
+		    
+			<!-- IMAGE -->
+			@Html.Partial("USNMiscPageElements/USN_MainImage",@Model.Content)
+			<!--// IMAGE -->
+	       
+			@Umbraco.Field("bodyText")
+		
+				
+			@Html.Partial("USNStandardPageComponents/USN_StandardPageComponents",@Model.Content)
+		
+            <!-- META -->
+            @Html.Partial("USNBlog/USN_BlogMeta", @Model.Content)
+            <!--// META -->
+
+			<!-- AUTHOR BIO -->
+			@Html.Partial("USNBlog/USN_BlogAuthorship",@Model.Content)
+			<!--// AUTHOR BIO -->
+		
+            <!-- PAGINATION  -->
+			@Html.Partial("USNBlog/USN_BlogPostPreviousNext",@Model.Content)	
+		    <!--// PAGINATION -->
+
+            <!-- COMMENTS -->
+			@Html.Partial("USNBlog/USN_BlogComments",@Model.Content)
+            <!--// COMMENTS -->
+		</div>
+		<!--// CONTENT COL -->
+			
+	
+		@Html.Partial("USNLayout/USN_PodAndNavColumn", @Model.Content, new ViewDataDictionary { { "podstyle", "verticle" } })
+			
+	</div>
+	<!--// ROW -->
+
+    @Html.Partial("USNSiteWidePods/USN_SitewidePods", @Model.Content, new ViewDataDictionary { { "podstyle", "horizontal" } })
+		
+</div>
+</section>	
+<!--// CONTENT -->
+		
+@section BodyTag
+{
+<body>
+}
+
+@section FooterScripts
+{
+    @Html.Partial("USNBlog/USN_BlogDisqusCommentCountScript", @Model.Content)
+}

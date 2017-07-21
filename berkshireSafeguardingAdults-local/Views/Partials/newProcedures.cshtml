@@ -1,0 +1,219 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@using USNStarterKit.USNUrlPicker.Models;
+@using USNStarterKit.USNHeading.Models;
+
+<div class="page_component accordion">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="heading-1">
+                <p class="heading panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-1337-1-new" aria-expanded="false" aria-controls="collapse-1337-1" class="collapsed">
+                        Core Procedures<i class="fa fa-chevron-down pull-right after highlight"></i>
+                    </a>
+                </p>
+            </div>
+            <div id="collapse-1337-1-new" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse-1337-1-new" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                    @{
+                        var coreProcedure = Umbraco.Content(1324).Children.Where("Visible").OrderBy("CreateDate");  
+                    }
+                    <ul class="summary-list">
+                        @foreach (var item in coreProcedure)
+                        {
+                            LinkInfo pdfUrl = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(item.GetPropertyValue<UrlPicker>("pdfUrl"));
+                            if ((DateTime.Now - item.CreateDate).TotalDays < 1) //show 'new' icon if created date total days is less than 1 day
+                            {
+                                if (pdfUrl != null)
+                                {
+                                    <li>
+                                        <p><a href="@pdfUrl.LinkURL" target="_blank">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <p><a href="@item.Url">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                        @item.newsSummary
+                                    </li>
+                                }
+                            }
+                            else { }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="page_component accordion">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="heading-1">
+                <p class="heading panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-1337-2-new" aria-expanded="false" aria-controls="collapse-1337-1" class="collapsed">
+                        Safeguarding Practice Guidance<i class="fa fa-chevron-down pull-right after highlight"></i>
+                    </a>
+                </p>
+            </div>
+            <div id="collapse-1337-2-new" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse-1337-2-new" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                    @{
+                        var safeguardingPractice = Umbraco.Content(1352).Children.Where("Visible").OrderBy("CreateDate");
+                    }
+                    <ul class="summary-list">
+                        @foreach (var item in safeguardingPractice)
+                        {
+                            LinkInfo pdfUrl = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(item.GetPropertyValue<UrlPicker>("pdfUrl"));
+                            if ((DateTime.Now - item.CreateDate).TotalDays < 1) //show 'new' icon if created date total days is less than 1 day
+                            {
+                                if (pdfUrl != null)
+                                {
+                                    <li>
+                                        <p><a href="@pdfUrl.LinkURL" target="_blank">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <p><a href="@item.Url">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                        @item.newsSummary
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page_component accordion">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="heading-1">
+                <p class="heading panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-1337-3-new" aria-expanded="false" aria-controls="collapse-1337-1" class="collapsed">
+                        Learning and Improvement<i class="fa fa-chevron-down pull-right after highlight"></i>
+                    </a>
+                </p>
+            </div>
+            <div id="collapse-1337-3-new" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse-1337-3-new" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                    @{
+                        var learningImprovement = Umbraco.Content(1355).Children.Where("Visible").OrderBy("CreateDate");
+                    }
+                    <ul class="summary-list">
+                        @foreach (var item in learningImprovement)
+                        {
+                            LinkInfo pdfUrl = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(item.GetPropertyValue<UrlPicker>("pdfUrl"));
+                            if ((DateTime.Now - item.CreateDate).TotalDays < 1) //show 'new' icon if created date total days is less than 1 day
+                            {
+                                if (pdfUrl != null)
+                                {
+                                    <li>
+                                        <p><a href="@pdfUrl.LinkURL" target="_blank">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <p><a href="@item.Url">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                        @item.newsSummary
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page_component accordion">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="heading-1">
+                <p class="heading panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-1337-4-new" aria-expanded="false" aria-controls="collapse-1337-1" class="collapsed">
+                        Roles and Responsibilities of LSCB<i class="fa fa-chevron-down pull-right after highlight"></i>
+                    </a>
+                </p>
+            </div>
+            <div id="collapse-1337-4-new" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse-1337-4-new" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                    @{
+                        var rolesResponsibilities = Umbraco.Content(1357).Children.Where("Visible").OrderBy("CreateDate");
+                    }
+                    <ul class="summary-list">
+                        @foreach (var item in rolesResponsibilities)
+                        {
+                            LinkInfo pdfUrl = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(item.GetPropertyValue<UrlPicker>("pdfUrl"));
+                            if ((DateTime.Now - item.CreateDate).TotalDays < 1) //show 'new' icon if created date total days is less than 1 day
+                            {
+                                if (pdfUrl != null)
+                                {
+                                    <li>
+                                        <p><a href="@pdfUrl.LinkURL" target="_blank">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <p><a href="@item.Url">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                        @item.newsSummary
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page_component accordion">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="heading-1">
+                <p class="heading panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-1337-5-new" aria-expanded="false" aria-controls="collapse-1337-1" class="collapsed">
+                        Appendices and Protocols<i class="fa fa-chevron-down pull-right after highlight"></i>
+                    </a>
+                </p>
+            </div>
+            <div id="collapse-1337-5-new" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse-1337-5-new" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                    @{
+                        var appendicesProtocols = Umbraco.Content(1359).Children.Where("Visible").OrderBy("CreateDate");
+                    }
+                    <ul class="summary-list">
+                        @foreach (var item in appendicesProtocols)
+                        {
+                            LinkInfo pdfUrl = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(item.GetPropertyValue<UrlPicker>("pdfUrl"));
+                            if ((DateTime.Now - item.CreateDate).TotalDays < 1) //show 'new' icon if created date total days is less than 1 day
+                            {
+                                if (pdfUrl != null)
+                                {
+                                    <li>
+                                        <p><a href="@pdfUrl.LinkURL" target="_blank">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <p><a href="@item.Url">@item.Name</a><i class="icon" style="background: red!important; color: #fff;">New</i></p>
+                                        @item.newsSummary
+                                    </li>
+                                }
+                            }
+
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

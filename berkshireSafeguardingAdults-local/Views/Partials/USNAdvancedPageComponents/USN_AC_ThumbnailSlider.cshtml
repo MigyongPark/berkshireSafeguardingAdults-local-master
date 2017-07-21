@@ -1,0 +1,87 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNUrlPicker.Models;
+@using USNStarterKit.USNHeading.Models;
+
+@{
+    <!-- COMPONENT ANCHOR -->
+    <a id="pos_@Model.Content.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    int totalCount = Model.Content.Children.Where(x => x.IsDocumentType("USN_AC_Thumbnail")).Count();
+
+    if (totalCount > 0)
+    {
+        string backgroundStyle = "";
+
+        if (Model.Content.HasValue("backgroundColor") && Model.Content.GetProperty("backgroundColor").Value.ToString() == "Grey")
+        {
+            backgroundStyle = "style=\"background-color:#eeeeee\"";
+        }
+        
+        <section class="content advanced-component image_carousel" @Html.Raw(backgroundStyle)>
+            <div class="container">
+                <!-- ROW -->
+                <div class="row">
+
+                    @if (Model.Content.HasValue("heading") || Model.Content.HasValue("introduction"))
+                    { 
+                    <div class="col-md-9 col-xs-12">
+                        @if (Model.Content.HasValue("heading"))
+                        {
+                            var heading = Model.Content.GetPropertyValue<USNHeading>("heading");
+
+                            if (heading != null && !String.IsNullOrEmpty(heading.Heading))
+                            {
+                                @Html.Raw("<" + heading.HeadingStyle + " class=\"heading main\">")
+                                <span class="underline">@heading.Heading</span>
+                                @Html.Raw("</" + heading.HeadingStyle + ">")
+                            }
+                        }
+                        @if (Model.Content.HasValue("introduction"))
+                        {
+                            @Html.Raw(Model.Content.GetProperty("introduction").Value)
+                        }
+                    </div>
+                    }
+                    
+                    <div class="col-xs-12">
+                        <div class="gallery slides">
+                            @foreach (var thumbnail in Model.Content.Children.Where(x => x.IsDocumentType("USN_AC_Thumbnail")))
+                            {
+                                if (thumbnail.HasValue("thumbnailImage") && Umbraco.TypedMedia(thumbnail.GetProperty("thumbnailImage").Value) != null)
+                                {
+                                    LinkInfo link = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(thumbnail.GetPropertyValue<UrlPicker>("thumbnailLink"));
+                                    
+                                    <div class="item">
+                                        <div class="image">
+                                            @if (link != null)
+                                            {
+                                                @Html.Raw("<a href=\"" + link.LinkURL + "\" " + link.LinkTitle + " " + link.LinkTarget + "\">")
+                                            }
+                                            <img src="@Umbraco.TypedMedia(thumbnail.GetProperty("thumbnailImage").Value).GetCropUrl(width: 300, height: 160)" alt="@thumbnail.GetProperty("thumbnailImageAltText").Value">
+                                            @if (link != null)
+                                            {
+                                                if (link.LinkIcon == String.Empty)
+                                                {
+                                                    <div class="overlayicon"><i class="fa fa-link"></i></div>
+                                                }
+                                                else
+                                                {  
+                                                    <div class="overlayicon">@Html.Raw(link.LinkIcon)</div>
+                                                }
+                                                @Html.Raw("</a>")
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!--// ROW -->
+            </div>
+        </section>
+    }
+}
+

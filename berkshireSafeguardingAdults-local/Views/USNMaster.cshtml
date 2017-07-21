@@ -1,0 +1,187 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = null;
+    var home = @CurrentPage.Site();
+    string sectionName = "";
+    int cpaos = CurrentPage.AncestorOrSelf(2).Id;
+}
+
+@switch (cpaos)
+{
+    case 1236:
+        sectionName = "bracknell";
+        break;
+    case 1238:
+        sectionName = "reading";
+        break;
+    case 1240:
+        sectionName = "slough";
+        break;
+    case 1242:
+        sectionName = "west-berkshire";
+        break;
+    case 1244:
+        sectionName = "windsor-maidenhead";
+        break;
+    case 1246:
+        sectionName = "wokingham";
+        break;
+    default:
+        sectionName = "";
+        break;
+}
+
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="description" content='@Umbraco.Field("metaDescription")'>
+    @Html.Partial("USNWebsiteHeadSection/USN_SEOPageHead", @Model)
+
+    <!-- WEB FONT -->
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Playfair+Display:400,400italic,700,700italic|Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+
+    <!-- STYLESHEETS -->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/plugins.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/palette.css">
+
+    <!-- INTERNAL STYLES -->
+    @Html.Partial("USNWebsiteHeadSection/USN_InternalStyles", @Model)
+
+    <!-- SCRIPTS -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script src="/scripts/bootstrap.js"></script>
+    <script src="/scripts/plugins.js"></script>
+    <script src="/scripts/application.js"></script>
+    <script src="/scripts/jquery.validate.min.js"></script>
+    <script src="/scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="/scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- ICONS -->
+    @Html.Partial("USNWebsiteHeadSection/USN_Icons", @Model)
+
+    @RenderSection("Head", false)
+    @Html.Partial("USNWebsiteHeadSection/USN_HeaderScripts", @Model)
+
+</head>
+@RenderSection("BodyTag", false)
+<!-- SITE -->
+<div id="site" class="@sectionName">
+
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <h1>Berkshire Safeguarding Adults</h1>
+            <!-- LOGO -->
+            @Html.Partial("USNWebsiteHeadSection/USN_WebsiteLogo", @Model)
+            <!--// LOGO -->
+            <!-- NAVIGATION -->
+            <div class="navigation">
+
+                <!-- EXPAND -->
+                @*<a class="expand">
+                        <em>Menu</em>
+                        <span class="line top"></span>
+                        <span class="line mid"></span>
+                        <span class="line bottom"></span>
+                    </a>
+                    <!--// EXPAND -->*@
+                <!-- REVEAL -->
+                <div class="reveal">
+
+                    @Html.Partial("USNNavigation/USN_MainNavigation", @Model)
+
+                    @*@Html.Partial("USNForms/USN_SearchForm", @Model.Content)*@
+
+                    @Html.Partial("USNNavigation/USN_TopNavigation", @Model)
+
+                </div>
+                <!--// REVEAL -->
+            </div>
+            <!--// NAVIGATION -->
+        </div>
+    </header>
+    <!--// HEADER -->
+    <!-- HEADER IMAGE SECTION-->
+    @Html.Partial("USNMiscPageElements/USN_HeaderImageSection", @Model.Content)
+    <!--// HEADER IMAGE SECTION -->
+    <!-- BREADCRUMB -->
+    @Html.Partial("USNNavigation/USN_Breadcrumb", @Model)
+    <!--// BREADCRUMB -->
+
+    @RenderBody()
+    @*
+        <!-- OUTRO STRIP -->
+        @Html.Partial("USNMiscPageElements/USN_OutroStripSection", @Model)
+         <!--// OUTRO STRIP -->
+    *@
+    <!-- FOOTER -->
+    <footer class="dark_bg">
+        <div class="container">
+            <!-- ROW -->
+            <div class="row">
+                <div class="col-md-4 col-sm-5">
+                    <!-- COMPANY DETAILS -->
+                    @Html.Partial("USNWebsiteFooterSection/USN_FooterContactInformation", @Model)
+                    <!--// COMPANY DETAILS -->
+                </div>
+                <div class="col-md-4 col-md-offset-0 col-sm-6 col-sm-offset-1">
+                    @Html.Partial("USNWebsiteFooterSection/USN_FooterSocialLinks", @Model)
+                </div>
+                <div class="col-lg-4 col-md-5 col-sm-12">
+                    @Html.Partial("USNNavigation/USN_FooterQuickLinks", @Model)
+                </div>
+            </div>
+            <!--// ROW -->
+            <!-- ROW -->
+            <div class="row">
+                <div class="">
+                    <nav class="footer">
+                        <ul class="nav">
+                            <div class="col-xs-12 col-sm-8">
+                                <li class="copyright"><div>Berkshire Safeguarding Adults &copy; @DateTime.Now.ToString("yyyy")</div></li>
+                                @Html.Partial("USNNavigation/USN_FooterNavigation", @Model)
+                            </div>
+                            <div class="col-xs-12 col-sm-4">
+                                <li><a href="https://webteam.berkshire.nhs.uk" target="_blank">Webteam</a></li>
+                            </div>
+                            <div class="col-xs-12 ">
+                            </div>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!--// ROW -->
+        </div>
+    </footer>
+    <!--// FOOTER -->
+    <!-- BACK TO TOP -->
+    <span id="top-link-block">
+        <a href="#top" class="well well-sm" onclick="$('html,body').animate({scrollTop:0},'slow');return false;">
+            <i class="glyphicon glyphicon-chevron-up"></i>
+        </a>
+    </span>
+    <!--// BACK TO TOP -->
+
+</div>
+<!--// SITE -->
+@RenderSection("FooterScripts", false)
+@Html.Partial("USNWebsiteFooterSection/USN_FooterScripts", @Model)
+</body>
+</html>

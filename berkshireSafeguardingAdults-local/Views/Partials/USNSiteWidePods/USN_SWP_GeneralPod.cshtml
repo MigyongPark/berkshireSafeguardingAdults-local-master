@@ -1,0 +1,63 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+    string podStyle = ViewData["podstyle"].ToString();
+
+    LinkInfo podLink = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(Model.Content.GetPropertyValue<UrlPicker>("podLink"));
+    
+    string podHeading = Model.Content.GetProperty("podHeading").Value.ToString();
+    string podText = Model.Content.GetProperty("podText").Value.ToString();
+
+    if (podStyle == "horizontal")
+    {
+        @Html.Raw("<div class=\"col-lg-3 col-md-4 col-sm-6 col-xs-12\">");
+    }
+
+    <div class="item panel panel-default">
+        <div class="panel-body">
+        @if (podLink != null || podHeading != String.Empty)
+        {
+            if (podLink != null)
+            {
+                @Html.Raw("<a href=\"" + podLink.LinkURL + "\" " + podLink.LinkTitle + " " + podLink.LinkTarget + ">")
+            }
+            if (podHeading != String.Empty)
+            {
+                @Html.Raw("<p class=\"heading\"><span class=\"underline\">" + podHeading + " " + ((podLink != null) ? podLink.LinkIcon : "") + "</span></p>")
+            }
+            if (podLink != null)
+            {
+                @Html.Raw("</a>")
+            }
+        }
+
+        @if (podText != String.Empty || podLink != null)
+        {
+            @Html.Raw("<div class=\"info\">");
+        }
+
+        @if (podText != String.Empty)
+        {
+            <div class="text">@Html.Raw(podText)</div>
+        }
+
+        @if (podLink != null)
+        {
+            <p class="link"><a href="@podLink.LinkURL" @Html.Raw(podLink.LinkTitle) @Html.Raw(podLink.LinkTarget) class="btn btn-primary">@podLink.LinkCaption@Html.Raw(podLink.LinkIcon)</a></p>
+        }
+
+        @if (podText != String.Empty || podLink != null)
+        {
+            @Html.Raw("</div>");
+        }
+        </div>
+    </div>
+    
+    if (podStyle == "horizontal")
+    {
+        @Html.Raw("</div>");
+    }
+
+}

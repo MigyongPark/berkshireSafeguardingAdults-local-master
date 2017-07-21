@@ -1,0 +1,71 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<USNStarterKit.USNModels.USNNewsletterFormViewModel>
+
+@using USNStarterKit.USNHeading.Models;
+
+@{
+    var currentPage = Umbraco.TypedContent(Model.CurrentNodeID);
+
+    string backgroundStyle = "";
+    string firstDivClass = "col-md-6 col-xs-12 pull-left";
+    string secondDivClass = "col-md-5 col-xs-12 pull-right";
+
+    if (currentPage.HasValue("backgroundColor") && currentPage.GetProperty("backgroundColor").Value.ToString() == "Grey")
+    {
+        backgroundStyle = "style=\"background-color:#eeeeee\"";
+    }
+
+    if (currentPage.HasValue("textSectionPosition") && currentPage.GetProperty("textSectionPosition").Value.ToString() == "Right")
+    {
+        firstDivClass = "col-md-5 col-xs-12 pull-right";
+        secondDivClass = "col-md-6 col-xs-12 pull-left";
+    }
+
+     <!-- COMPONENT ANCHOR -->
+    <a id="pos_@currentPage.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    <section class="content advanced-component text-with-form" @Html.Raw(backgroundStyle)>
+        <div class="container">
+
+            <!-- ROW -->
+            <div class="row">
+
+                <div class="@firstDivClass">
+
+                    <!-- INFO -->
+                    <div class="info">
+                                                
+                        @if (currentPage.HasValue("heading"))
+                        {
+                            var heading = currentPage.GetPropertyValue<USNHeading>("heading");
+
+                            if (heading != null && !String.IsNullOrEmpty(heading.Heading))
+                            {
+                                @Html.Raw("<" + heading.HeadingStyle + " class=\"heading main\"><span class=\"underline\">")
+                                @heading.Heading
+                                @Html.Raw("</span></" + heading.HeadingStyle + ">")
+                            }
+                        }
+
+                        @if (currentPage.HasValue("text"))
+                        {
+                            @Html.Raw(currentPage.GetProperty("text").Value)
+                        }
+                    </div>
+                    <!--// INFO -->
+
+                </div>
+
+                <div class="@secondDivClass">
+
+                    @Html.Partial("USNForms/USN_NewsletterSignup", @Model)
+
+                </div>
+
+            </div>
+            <!--// ROW -->
+
+        </div>
+    </section>
+
+}

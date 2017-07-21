@@ -1,0 +1,51 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using Newtonsoft.Json.Linq;
+	
+@{
+    IPublishedContent homeNode = Model.Content.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var navigation = settingsFolder.Children.Where(x => x.IsDocumentType("USNNavigation")).First();
+
+    var footerQuickLinks = navigation.GetPropertyValue<JArray>("footerQuickLinks");
+
+    if (navigation.HasValue("footerQuickLinksHeading") || (footerQuickLinks != null && navigation.GetPropertyValue<string>("footerQuickLinks", true, "").Length > 2))
+    {
+        <div class="quick_links">
+	    @if (navigation.HasValue("footerQuickLinksHeading"))
+        {
+	        <p class="heading"><span class="underline">@navigation.GetProperty("footerQuickLinksHeading").Value</span></p>
+        }
+        
+        @*@Html.Partial("USNForms/USN_SearchForm", @Model.Content)*@
+
+		@if (footerQuickLinks != null && navigation.GetPropertyValue<string>("footerQuickLinks", true, "").Length > 2)
+        {
+			<nav class="row">
+			    <ul>
+				@foreach (JObject link in footerQuickLinks)
+                {
+                    string linkTitle = String.Empty;
+                    string linkURL = String.Empty;
+                    string linkTarget = String.Empty;
+                    string linkIcon = String.Empty;
+                    IPublishedContent node = null;
+
+                    linkURL = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromJObject(link, out linkTitle, out linkTarget, out linkIcon, out node);
+
+                    if (linkURL!= String.Empty)
+                    { 
+
+                    <li class="col-xs-6">
+                        <a href="@linkURL" @Html.Raw(linkTarget) @Html.Raw(linkTitle)>
+                            @*<i class="fa fa-angle-right"></i>*@ @(link.Value<string>("caption"))@Html.Raw(linkIcon)
+                        </a>
+                    </li>
+                    }
+                }
+				</ul>
+			</nav> 
+        }
+		</div>
+    }
+}

@@ -1,0 +1,49 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNHelpers;
+
+@{
+
+    string podStyle = ViewData["podstyle"].ToString();
+    string title = "";
+
+    if (podStyle == "horizontal")
+    {
+        @Html.Raw("<div class=\"col-lg-3 col-md-4 col-sm-6 col-xs-12\">");
+    }
+
+    if (Model.Content.HasValue("podVideo"))
+    {
+        string videoURLOriginal = Model.Content.GetProperty("podVideo").Value.ToString().Trim();
+
+        if (Model.Content.HasValue("lightwindowText"))
+        {
+            title = "data-title=\"" + Model.Content.GetProperty("lightwindowText").Value.ToString() + "\"";
+        }
+
+        string videoURLModified = "";
+        string videoImage = "";
+        string dataRemote = "";
+
+        videoImage = USNVideoHelper.GetVideoInfo(videoURLOriginal, out videoURLModified, out dataRemote);
+
+        if (Model.Content.HasValue("podThumbnailImage") && Umbraco.TypedMedia(Model.Content.GetProperty("podThumbnailImage").Value) != null)
+        {
+            videoImage = Umbraco.TypedMedia(Model.Content.GetProperty("podThumbnailImage").Value).GetCropUrl(width: 345, height: 260);
+        }
+
+        <div class="item videopod">
+            <div class="image">
+                <a href="@videoURLModified" @Html.Raw(title) data-toggle="lightbox" @Html.Raw(dataRemote)>
+                    <img src="@videoImage" alt="@Model.Content.GetProperty("thumbnailImageAltText").Value">
+                    <div class="overlayicon"><i class="fa fa-play fa-3x"></i></div>
+                </a>
+            </div>
+        </div>
+    }
+
+    if (podStyle == "horizontal")
+    {
+        @Html.Raw("</div>");
+    }
+}

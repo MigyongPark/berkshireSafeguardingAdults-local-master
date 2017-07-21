@@ -1,0 +1,80 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{	
+    if (Model.Content.HasProperty("hideSubNavigation") && !Model.Content.GetPropertyValue<bool>("hideSubNavigation"))
+	{
+		var parent = Model.Content.AncestorOrSelf(2);
+
+        var pages = parent.Children.Where(x => (x.IsDocumentType("USNStandardPagelevel1") || x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel1") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")) && x.IsVisible());
+
+        if (pages.Count() > 0)
+		{
+		
+		<!-- SUB - add another class after class="sub" to style for other types of nav: class="sub filter" -->
+		<nav class="sub">
+			<p class="heading">   
+				<a href="@parent.Url()">
+                    <span class="underline">
+                        @if (parent.HasValue("subNavigationLinkText"))
+                        {
+                            @parent.GetProperty("subNavigationLinkText").Value
+                        }
+                        else
+                        {
+                            @parent.Name
+                        }
+                    </span>
+				</a>
+			</p>
+            <div class="panel panel-default">
+			    @traverse(parent)
+            </div>
+		</nav>
+		<!--// SUB -->		
+	    }
+    }
+}
+	
+@helper traverse(IPublishedContent parent)
+{
+    int count = parent.Children.Where(x => (x.IsDocumentType("USNStandardPagelevel1") || x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel1") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")) && x.IsVisible()).Count();
+		
+	if(count > 0)
+	{
+	  
+	<ul class="nav"> 
+		@foreach (var node in parent.Children.Where(x => (x.IsDocumentType("USNStandardPagelevel1") || x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel1") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")) && x.IsVisible()))
+		{
+			if(node != null)
+			{
+                string selected = Array.IndexOf(Model.Content.Path.Split(','), node.Id.ToString()) >= 0 ? " class=\"active\"" : "";
+
+		        <li @Html.Raw(selected)>
+			    <a href="@node.Url()">  	
+				    <span>
+                    @if (node.Level > 3)
+                    {
+                        <i class="fa fa-angle-right"></i>
+                    }
+				    @if (node.HasValue("subNavigationLinkText"))
+				    {
+					    @node.GetProperty("subNavigationLinkText").Value
+				    }
+				    else
+				    {
+					    @node.Name
+				    }
+				    </span>
+			    </a>
+			    @if(selected != String.Empty)
+			    {
+				    @traverse(node)
+			    }
+	
+		        </li>
+		    }
+		}
+	</ul> 
+	}
+}   
+  

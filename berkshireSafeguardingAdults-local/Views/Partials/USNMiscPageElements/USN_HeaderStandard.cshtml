@@ -1,0 +1,41 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNHelpers;
+
+@{
+
+    IPublishedContent homeNode = Model.Content.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var globalSettings = settingsFolder.Children.Where(x => x.IsDocumentType("USNGlobalSettings")).First();
+
+    if (Model.Content.GetPropertyValue<Boolean>("hideHeaderImageSection") || (Model.Content.GetPropertyValue<Boolean>("overrideDefaultHeaderImageSection") && !Model.Content.HasValue("headerBackgroundImage")) || (!Model.Content.GetPropertyValue<Boolean>("overrideDefaultHeaderImageSection") && !globalSettings.HasValue("defaultHeaderBackgroundImage")))
+    {
+        if (Model.Content.IsDocumentType("USNBlogLandingPage"))
+        {
+            string catID = Request.QueryString["category"];
+
+            if (String.IsNullOrEmpty(catID))
+            {
+                <h1>@Umbraco.Field("onPageTitle", altFieldAlias: "pageName")</h1>
+            }
+            else
+            {
+                var catPage = Umbraco.TypedContent(Convert.ToInt32(catID));
+                if (catPage.HasValue("categoryPageTitle"))
+                {
+                    <h1>@catPage.GetProperty("categoryPageTitle").Value</h1>
+                }
+                else
+                {
+                    <h1>@catPage.Name</h1>
+                }
+            }
+        }
+        else
+        {
+            <h1 itemprop="name headline">@Umbraco.Field("onPageTitle", altFieldAlias: "pageName")</h1>
+        }
+
+    }
+}
+

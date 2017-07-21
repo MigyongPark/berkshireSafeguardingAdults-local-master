@@ -1,0 +1,119 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<USNStarterKit.USNModels.USNContactFormViewModel>
+
+@using USNStarterKit.USNHeading.Models;
+
+@using (Ajax.BeginForm("HandleContactSubmit", "USNContactFormSurface", new AjaxOptions
+{
+    HttpMethod = "POST",
+    InsertionMode = InsertionMode.Replace,
+    UpdateTargetId = "ContactFormContainer" + @Model.CurrentNodeID,
+    LoadingElementId = "ContactAjaxLoading" + @Model.CurrentNodeID
+}))
+{
+    var currentNode = Umbraco.TypedContent(Model.CurrentNodeID);
+
+    IPublishedContent homeNode = currentNode.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var globalSettings = settingsFolder.Children.Where(x => x.IsDocumentType("USNGlobalSettings")).First();
+
+    var containerID = "ContactFormContainer" + Model.CurrentNodeID;
+    var ajaxLoadingID = "ContactAjaxLoading" + Model.CurrentNodeID;
+    var errorID = "ContactError" + Model.CurrentNodeID;
+    
+    if (Model.PageType == "advanced")
+    {
+        @Html.Raw("<section class=\"content advanced-component standard-components\"><div class=\"container\"><div class=\"row\"><div id=\"mid_col\" class=\"col-md-8 col-md-offset-2 col-xs-12\" role=\"main\">")
+    }
+
+    @Html.Hidden("CurrentNodeID", Model.CurrentNodeID)
+    @Html.AntiForgeryToken()
+    <div class="form ajax_wrap">
+        @if (currentNode.HasValue("contactFormHeading"))
+        {
+            var contactFormHeading = currentNode.GetPropertyValue<USNHeading>("contactFormHeading");
+
+            if (contactFormHeading != null && !String.IsNullOrEmpty(contactFormHeading.Heading))
+            {
+                @Html.Raw("<" + contactFormHeading.HeadingStyle + " class=\"heading main\"><span class=\"underline\">")
+                @contactFormHeading.Heading
+                @Html.Raw("</span></" + contactFormHeading.HeadingStyle + ">")
+            }
+       
+        }
+
+        @if (currentNode.HasValue("contactFormIntroduction"))
+        {
+            @Html.Raw(currentNode.GetProperty("contactFormIntroduction").Value)
+        }
+        <div id="@containerID">
+            <div class="alert alert-danger alert-dismissible fade in" id="@errorID" style="display:none">
+            </div>
+            <fieldset>
+                <!-- ROW -->
+                <div class="row">
+                    <div class="form-group col-sm-6 col-xs-12">
+                        <label for="FirstName" class="control-label">
+                            @umbraco.library.GetDictionaryItem("USN Form First Name Label") <em class="req">*</em>
+                        </label>
+                        @Html.TextBoxFor(x => Model.FirstName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => Model.FirstName, umbraco.library.GetDictionaryItem("USN Form First Name Validation"))
+                    </div>
+                    <div class="form-group col-sm-6 col-xs-12">
+                        <label for="LastName" class="control-label">
+                            @umbraco.library.GetDictionaryItem("USN Form Last Name Label") <em class="req">*</em>
+                        </label>
+                        @Html.TextBoxFor(x => Model.LastName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(x => Model.LastName, umbraco.library.GetDictionaryItem("USN Form Last Name Validation"))
+                    </div>
+                </div>
+                <!--// ROW -->
+                <!-- ROW -->
+                <div class="row">
+                    <div class="form-group col-sm-6 col-xs-12">
+                        <label for="Email" class="control-label">
+                            @umbraco.library.GetDictionaryItem("USN Form Email Address Label") <em class="req">*</em>
+                        </label>
+                        @Html.TextBoxFor(x => Model.Email, new { autocapitalize = "off", @class = "form-control" })
+                        @Html.ValidationMessageFor(x => Model.Email, umbraco.library.GetDictionaryItem("USN Form Email Address Validation"))
+                    </div>
+                    <div class="form-group col-sm-6 col-xs-12">
+                        <label for="Telephone" class="control-label">
+                            @umbraco.library.GetDictionaryItem("USN Form Telephone Label")
+                        </label>
+                        @Html.TextBoxFor(x => Model.Telephone, new { @type = "tel", @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Message" class="control-label">
+                        @umbraco.library.GetDictionaryItem("USN Form Message Label")
+                    </label>
+                    @Html.TextAreaFor(model => model.Message, new { rows = 5, @class = "form-control" })
+                </div>
+
+                @if (globalSettings.HasValue("campaignMonitorAPIKey") && (globalSettings.HasValue("defaultCampaignMonitorSubscriberListID") || currentNode.HasValue("campaignMonitorSubscriberListID")))
+                {
+                    <div class="checkbox">
+                        <label for="NewsletterSignup">@Html.CheckBoxFor(x => Model.NewsletterSignup ) @umbraco.library.GetDictionaryItem("USN Form Newsletter Signup Label")</label>
+                    </div>
+                }
+            </fieldset>
+            <fieldset>
+                <button class="btn btn-primary" type="submit">
+                    <span>@currentNode.GetProperty("contactFormButtonText").Value</span>
+                </button>
+            </fieldset>
+            <div class="ajax_loading" id="@ajaxLoadingID" style="display:none">
+                <div class="loading">
+                    <span class="message">@umbraco.library.GetDictionaryItem("USN Contact Form Sending Message")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    @* Close container for page components on advanced page *@
+    if (Model.PageType == "advanced")
+    {
+        @Html.Raw("</div></div></div></section>")
+    }
+}

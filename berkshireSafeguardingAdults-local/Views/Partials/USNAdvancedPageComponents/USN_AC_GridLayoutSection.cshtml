@@ -1,0 +1,18 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{
+    <!-- COMPONENT ANCHOR -->
+    <a id="pos_@Model.Content.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    string backgroundStyle = "";
+
+    if (Model.Content.HasValue("backgroundColor") && Model.Content.GetProperty("backgroundColor").Value.ToString() == "Grey")
+    {
+        backgroundStyle = "style=\"background-color:#eeeeee\"";
+    }
+    
+    <section class="content advanced-component grid" @Html.Raw(backgroundStyle)>
+        @Model.Content.GetGridHtml("grid", "Bootstrap3")
+    </section>
+}

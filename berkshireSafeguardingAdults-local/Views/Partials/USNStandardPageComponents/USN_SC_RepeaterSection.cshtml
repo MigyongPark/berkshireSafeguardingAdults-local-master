@@ -1,0 +1,82 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{
+    string pageType = ViewData["pageType"].ToString();
+    
+    int tabHeadingCount = 1;
+    int tabContentCount = 1;
+    int accordionCount = 1;
+
+    if (Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_RepeaterItem")).Count() > 0)
+    {
+       <!-- COMPONENT ANCHOR -->
+        <a id="pos_@Model.Content.Id"></a>
+       <!--// COMPONENT ANCHOR -->
+    
+        @* Add container for page components on advanced page *@
+        if (pageType == "advanced")
+        { 
+        	@Html.Raw("<section class=\"content advanced-component standard-components\"><div class=\"container\"><div class=\"row\"><div id=\"mid_col\" class=\"col-md-8 col-md-offset-2 col-xs-12\" role=\"main\">")
+        }
+
+        if (Model.Content.GetProperty("repeaterStyle").Value.ToString() == "Tabbed")
+        {
+		    <!-- PAGE COMPONENT TABBED -->
+            <div class="page_component tabbed" role="tabpanel">
+                <ul class="nav nav-tabs responsive" role="tablist">
+                    @foreach (var item in Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_RepeaterItem")).OrderBy("SortOrder"))
+                    {
+                        <li role="presentation" @if(tabHeadingCount == 1){@Html.Raw("class=\"active\"")}><a href="#tabname-@Model.Content.Id-@tabHeadingCount" aria-controls="tabname-@Model.Content.Id-@tabHeadingCount" role="tab" data-toggle="tab">@item.Name<i class="fa fa-chevron-down pull-right after highlight"></i></a></li>
+                        tabHeadingCount += 1;
+                    }
+                </ul>
+                <div class="tab-content responsive">
+                    @foreach (var item in Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_RepeaterItem")).OrderBy("SortOrder"))
+                    {
+                        <div id="tabname-@Model.Content.Id-@tabContentCount" role="tabpanel" class="tab-pane  @if(tabContentCount == 1){@Html.Raw("active")}">
+                            @Html.Raw(item.GetProperty("repeaterText").Value.ToString().Trim())
+                        </div>
+
+                        tabContentCount += 1;
+                    }
+                </div>
+            </div>
+			<!--// PAGE COMPONENT TABBED -->
+        }
+        else
+        {
+    		<!-- PAGE COMPONENT ACCORDION -->
+            <div class="page_component accordion">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                @foreach (var item in Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_RepeaterItem")).OrderBy("SortOrder"))
+                {
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="heading-@accordionCount">
+                            <p class="heading panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@Model.Content.Id-@accordionCount" aria-expanded="true" aria-controls="collapse-@Model.Content.Id-@accordionCount">
+                                    @item.Name<i class="fa fa-chevron-down pull-right after highlight"></i>
+                                </a>
+                            </p>
+                        </div>
+                        <div id="collapse-@Model.Content.Id-@accordionCount" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapse-@Model.Content.Id-@accordionCount">
+                            <div class="panel-body">
+                                @Html.Raw(item.GetProperty("repeaterText").Value.ToString().Trim())
+                            </div>
+                        </div>
+                    </div>
+                    
+                    accordionCount += 1;
+                }
+                </div>
+            </div>
+		    <!--// PAGE COMPONENT ACCORDION -->
+        }
+        
+        @* Close container for page components on advanced page *@
+        if (pageType == "advanced")
+        { 
+            @Html.Raw("</div></div></div></section>")
+        }
+    }
+
+}

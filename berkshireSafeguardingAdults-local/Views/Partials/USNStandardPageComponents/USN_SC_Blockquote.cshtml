@@ -1,0 +1,36 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{
+    string pageType = ViewData["pageType"].ToString();
+    
+    <!-- COMPONENT ANCHOR -->
+    <a id="pos_@Model.Content.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    @* Add container for page components on advanced page *@
+    if (pageType == "advanced")
+    {
+        @Html.Raw("<section class=\"content advanced-component standard-components\"><div class=\"container\"><div class=\"row\"><div id=\"mid_col\" class=\"col-md-8 col-md-offset-2 col-xs-12\" role=\"main\">")
+    }
+
+    <!-- PAGE COMPONENT BLOCKQUOTE -->
+    <div class="page_component quotes">
+        <blockquote>
+            <i class="fa fa-quote-left highlight"></i>
+            <p>@Html.Raw(umbraco.library.ReplaceLineBreaks(Model.Content.GetProperty("quote").Value.ToString()))</p>
+            @if (Model.Content.HasValue("cite"))
+            {
+                <cite>
+                	<span class="who">@Model.Content.GetProperty("cite").Value</span>
+                </cite>
+            }
+        </blockquote>
+    </div>
+    <!-- PAGE COMPONENT BLOCKQUOTE -->
+    
+    @* Close container for page components on advanced page *@
+    if (pageType == "advanced")
+    {
+        @Html.Raw("</div></div></div></section>")
+    }
+}

@@ -1,0 +1,109 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNUrlPicker.Models;
+@using USNStarterKit.USNHeading.Models;
+
+@{
+    <!-- COMPONENT ANCHOR -->
+    <a id="pos_@Model.Content.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    int totalCount = Model.Content.Children.Where(x => x.IsDocumentType("USN_AC_Banner")).Count();
+
+    if (totalCount > 0)
+    {
+        <section class="content advanced-component banner">
+            <div class="slides">
+                @foreach (var banner in Model.Content.Children.Where(x => x.IsDocumentType("USN_AC_Banner")))
+                {
+                    if (banner.HasValue("bannerImage") && Umbraco.TypedMedia(banner.GetProperty("bannerImage").Value) != null)
+                    {
+                        string itemBackground = "";
+                        string buttonClass = "btn-primary";
+                        
+                        LinkInfo bannerLink = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(banner.GetPropertyValue<UrlPicker>("bannerLink"));
+
+                        if (banner.HasValue("textColourScheme"))
+                        {
+                            switch (banner.GetProperty("textColourScheme").Value.ToString())
+                            {
+                                case "Light":
+                                    itemBackground = "dark_bg";
+                                    buttonClass = "btn-default";
+                                    break;
+                                default:
+                                    itemBackground = "";
+                                    buttonClass = "btn-primary";
+                                    break;
+                            }
+                        }
+                      
+                        <div class="item standard @itemBackground">
+
+                            <div class="image">
+                                <img src="@Umbraco.TypedMedia(banner.GetProperty("bannerImage").Value).GetCropUrl(width: 1400, height: 550)" alt="@banner.GetProperty("bannerImageAltText").Value">
+                            </div>
+
+                            @if (banner.HasValue("bannerHeading") || banner.HasValue("bannerText") || bannerLink != null)
+                            {
+                                string textAlignment = "text-left";
+
+                                if (banner.HasValue("bannerTextAlignment"))
+                                {
+                                    switch (banner.GetProperty("bannerTextAlignment").Value.ToString())
+                                    {
+                                        case "Left":
+                                            textAlignment = "text-left";
+                                            break;
+                                        case "Center":
+                                            textAlignment = "col-lg-offset-3 col-md-offset-2 text-center";
+                                            break;
+                                        case "Right":
+                                            textAlignment = "text-right pull-right";
+                                            break;
+                                        default:
+                                            textAlignment = "text-left";
+                                            break;
+                                    }
+                                }
+                                 
+                                <div class="info">
+                                    <div class="container valign">
+                                        <!-- ROW -->	
+				                        <div class="row">
+					
+                                            <div class="col-lg-6 col-md-8 col-xs-12 @textAlignment">
+                                                @if (banner.HasValue("bannerHeading"))
+                                                {
+                                                    var bannerHeading = banner.GetPropertyValue<USNHeading>("bannerHeading");
+
+                                                    if (bannerHeading != null && !String.IsNullOrEmpty(bannerHeading.Heading))
+                                                    {
+                                                        @Html.Raw("<" + bannerHeading.HeadingStyle + " class=\"heading main\">")
+                                                        <span class="underline">@bannerHeading.Heading</span>
+                                                        @Html.Raw("</" + bannerHeading.HeadingStyle + ">")
+                                                    }
+                                                }
+                                                @if (banner.HasValue("bannerText"))
+                                                {
+                                                    <div class="text">
+                                                        @Html.Raw(banner.GetProperty("bannerText").Value)
+                                                    </div>
+                                                }
+                                                @if (bannerLink != null)
+                                                {
+                                                    <p class="link"><a role="button" class="btn @buttonClass" href="@bannerLink.LinkURL" @Html.Raw(bannerLink.LinkTarget) @Html.Raw(bannerLink.LinkTitle)>@bannerLink.LinkCaption@Html.Raw(bannerLink.LinkIcon)</a></p>
+                                                }
+                                            </div>
+                                        </div>
+                                        <!--// ROW -->
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+        </section>
+    }
+}

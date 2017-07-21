@@ -1,0 +1,64 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = "USNMaster.cshtml";
+}
+
+@Html.Partial("USNAdvancedPageComponents/USN_AdvancedPageComponents", @Model.Content)	
+
+	
+	<section class="content advanced-component promo_pods" style="background-color:#eeeeee">
+    <div class="container">
+        <div class="row">
+            <div class="item col-md-4 col-sm-6 col-xs-12 odd">
+                <a href="/bracknell/">
+
+                    <p class="bracknell heading">Bracknell <i class="fa fa-book" aria-hidden="true"></i></p>
+
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 even">
+                <a href="/reading/">
+
+                    <p class="reading heading">Reading <i class="fa fa-book" aria-hidden="true"></i></p>
+
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 odd">
+                <a href="/slough/">
+
+                    <p class="slough heading">Slough <i class="fa fa-book" aria-hidden="true"></i></p>
+
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 even">
+                <a href="/west-berkshire/">
+
+                    <p class="west-berkshire heading">West Berkshire <i class="fa fa-book" aria-hidden="true"></i></p>
+
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 odd">
+                <a href="/windsor-maidenhead/">
+
+                    <p class="windsor-maidenhead heading">Windsor &amp; Maidenhead <i class="fa fa-book" aria-hidden="true"></i></p>
+
+                </a>
+            </div>
+            <div class="item col-md-4 col-sm-6 col-xs-12 even">
+                <a href="/wokingham/">
+
+                    <p class="wokingham heading">Wokingham <i class="fa fa-book" aria-hidden="true"></i></p>
+
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+						
+						
+@Html.Partial("USNSiteWidePods/USN_SitewidePods", @Model, new ViewDataDictionary { { "podstyle", "horizontal" } })
+	
+@section BodyTag
+{
+<body class="advanced-page">
+}

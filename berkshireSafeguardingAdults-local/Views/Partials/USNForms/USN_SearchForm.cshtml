@@ -1,0 +1,20 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{
+	
+	IPublishedContent homeNode = Model.Content.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var globalSettings = settingsFolder.Children.Where(x => x.IsDocumentType("USNGlobalSettings")).First();
+
+    if (globalSettings.HasValue("searchResultsPage") && globalSettings.HasValue("examineSearchProviderName"))
+    { 
+	<div class="site_search">
+		<form class="navbar-form" role="search" action="@umbraco.library.NiceUrl(Convert.ToInt32(globalSettings.GetProperty("searchResultsPage").Value))" method="get" name="searchForm">
+			<div class="form-group">
+                <input type="text" class="form-control" id="search_field" name="search_field" placeholder='@umbraco.library.GetDictionaryItem("USN Search Form Placeholder")' value="@Request.QueryString["search_field"]">
+			</div>
+			<button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-search"></i></button>
+		</form>
+	</div>
+    }
+}

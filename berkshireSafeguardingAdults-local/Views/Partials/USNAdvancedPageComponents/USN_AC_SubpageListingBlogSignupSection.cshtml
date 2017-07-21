@@ -1,0 +1,325 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<USNStarterKit.USNModels.USNNewsletterFormViewModel>
+
+@using USNStarterKit.USNHelpers;
+@using USNStarterKit.USNBlog;
+@using USNStarterKit.USNUrlPicker.Models;
+@using USNStarterKit.USNHeading.Models;
+
+@{
+    var currentPage = Umbraco.TypedContent(Model.CurrentNodeID);
+
+
+    string backgroundStyle = "";
+    string firstDivClass = "col-md-7 col-sm-12 pull-left";
+    string secondDivClass = "col-lg-4 col-md-5 col-sm-12 pull-right";
+
+    if (currentPage.HasValue("backgroundColor") && currentPage.GetProperty("backgroundColor").Value.ToString() == "Grey")
+    {
+        backgroundStyle = "style=\"background-color:#eeeeee\"";
+    }
+
+    if (currentPage.HasValue("subpageListingSectionPosition") && currentPage.GetProperty("subpageListingSectionPosition").Value.ToString() == "Right")
+    {
+
+        firstDivClass = "col-md-7 col-sm-12 pull-right";
+        secondDivClass = "col-lg-4 col-md-5 col-sm-12 pull-left";
+    }
+
+     <!-- COMPONENT ANCHOR -->
+    <a id="pos_@currentPage.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    <section class="content advanced-component" @Html.Raw(backgroundStyle)>
+        <div class="container">
+
+            <!-- ROW -->
+            <div class="row">
+
+                <div class="@firstDivClass">
+
+                    <!-- LISTING -->
+                    @{
+                        LinkInfo linkToListing = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(currentPage.GetPropertyValue<UrlPicker>("linkToListing"));
+
+                        if (linkToListing != null && currentPage.HasValue("pagesToDisplay"))
+                        {
+                            int pagesDisplayCount = Convert.ToInt32(currentPage.GetProperty("pagesToDisplay").Value);
+
+
+                            if (linkToListing.LinkUmbracoNode.Children.Where(x => x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")).Count() > 0)
+                            {
+                                <div class="listing grid">
+                                    @if (currentPage.HasValue("listingSectionHeading"))
+                                    {
+                                        var listingSectionHeading = currentPage.GetPropertyValue<USNHeading>("listingSectionHeading");
+
+                                        if (listingSectionHeading != null && !String.IsNullOrEmpty(listingSectionHeading.Heading))
+                                        {
+                                            @Html.Raw("<" + listingSectionHeading.HeadingStyle + " class=\"heading main\"><span class=\"underline\">")
+                                            @listingSectionHeading.Heading
+                                            @Html.Raw("</span></" + listingSectionHeading.HeadingStyle + ">")
+                                        }
+                                    }
+                                    @if (currentPage.HasValue("listingSectionIntroduction"))
+                                    {
+                                        @Html.Raw(currentPage.GetProperty("listingSectionIntroduction").Value)
+                                    }
+                                    <!-- ROW -->
+                                    <div class="row">
+                                    @foreach (var item in linkToListing.LinkUmbracoNode.Children.Where(x => x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")).OrderBy("SortOrder").Take(pagesDisplayCount))
+                                    {
+                                        Boolean displaySummaryText = false;
+                                        string introText = "";
+
+                                        if (item.HasValue("pageSummary"))
+                                        {
+                                            introText = item.GetProperty("pageSummary").Value.ToString();
+                                            displaySummaryText = true;
+                                        }
+                                        else
+                                        {
+                                            if (currentPage.HasValue("summaryTextCharacterCount"))
+                                            {
+                                                int summaryTextLength = Convert.ToInt32(currentPage.GetProperty("summaryTextCharacterCount").Value);
+
+                                                if (summaryTextLength > 0)
+                                                {
+                                                    introText = item.GetProperty("bodyText").Value.ToString().StripHtml().Trim();
+
+                                                    displaySummaryText = true;
+
+                                                    if (introText.Length >= summaryTextLength)
+                                                    {
+                                                        introText = introText.Substring(0, summaryTextLength);
+                                                    }
+
+                                                    if (introText.Length > 0)
+                                                    {
+                                                        introText = "<p>" + introText + " ...</p>";
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        <div class="item col-sm-6 col-xs-12">
+                                            <a href="@item.Url">
+                                                @if (item.HasValue("pageListingImage") && Umbraco.TypedMedia(item.GetProperty("pageListingImage").Value) != null)
+                                                {
+                                                    <div class="image">
+                                                        <img src="@Umbraco.TypedMedia(item.GetProperty("pageListingImage").Value).GetCropUrl(width: 380, height: 285)" alt="@item.GetProperty("pageListingImageAltText").Value">
+                                                    </div>
+                                                }
+                                                <p class="heading">
+                                                    @if (item.HasValue("subPageListingLinkText"))
+                                                    {
+                                                        @item.GetProperty("subPageListingLinkText").Value.ToString()
+                                                    }
+                                                    else
+                                                    {
+                                                        @item.Name
+                                                    }
+                                                </p>
+                                            </a>
+                                            @if (displaySummaryText && introText != String.Empty)
+                                            {
+                                            <div class="info">
+                                                <div class="text">
+                                                   @Html.Raw(introText)
+                                                </div>
+                                            </div>
+                                            }
+                                        </div>
+                                    }
+                                    </div>
+                                    <!--// ROW -->
+                                    <p class="link"><a class="btn btn-primary" href="@linkToListing.LinkURL" @Html.Raw(linkToListing.LinkTarget) @Html.Raw(linkToListing.LinkTitle)>@linkToListing.LinkCaption@Html.Raw(linkToListing.LinkIcon)</a></p>
+                                </div>
+                            }
+                        }
+                    }
+
+                    <!--// LISTING - BLOG -->
+
+                </div>
+
+                <div class="@secondDivClass">
+
+                    <div class="latest panel dark_bg">
+                        <div class="panel-body">
+
+                            <div class="col-md-12 col-sm-6 col-xs-12">
+
+                                <!-- BLOG -->
+                                @{
+                                    LinkInfo linkToBlog = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(currentPage.GetPropertyValue<UrlPicker>("linkToBlogLanding"));
+
+                                    if (linkToBlog != null && currentPage.HasValue("blogPostsToDisplay"))
+                                    {
+                                        int pagesDisplayCount = Convert.ToInt32(currentPage.GetProperty("blogPostsToDisplay").Value);
+
+                                        if (linkToBlog.LinkUmbracoNode.IsDocumentType("USNBlogLandingPage"))
+                                        {
+                                            IEnumerable<IPublishedContent> posts = USNPostService.Instance.GetPosts(linkToBlog.LinkUmbracoNode);
+
+                                            var nodes = posts.Take(pagesDisplayCount).ToList();
+
+                                            if (nodes.Count() > 0)
+                                            {
+                                                <div class="listing blog">
+                                                    @if (currentPage.HasValue("blogListingHeading"))
+                                                    {
+                                                        var listingSectionHeading = currentPage.GetPropertyValue<USNHeading>("blogListingHeading");
+
+                                                        if (listingSectionHeading != null && !String.IsNullOrEmpty(listingSectionHeading.Heading))
+                                                        {
+                                                            @Html.Raw("<" + listingSectionHeading.HeadingStyle + " class=\"heading main\"><span class=\"underline\">")
+                                                            @listingSectionHeading.Heading
+                                                            @Html.Raw("</span></" + listingSectionHeading.HeadingStyle + ">")
+                                                        }
+                                                    }
+
+                                                    @foreach (var node in nodes)
+                                                    {
+                                                        Boolean displaySummaryText = false;
+                                                        string introText = "";
+
+                                                        if (node.HasValue("postSummary"))
+                                                        {
+                                                            introText = node.GetProperty("postSummary").Value.ToString();
+                                                            displaySummaryText = true;
+                                                        }
+                                                        else
+                                                        {
+                                                            if (currentPage.HasValue("summaryTextCharacterCount"))
+                                                            {
+                                                                introText = library.StripHtml(node.GetProperty("bodyText").Value.ToString());
+
+                                                                displaySummaryText = true;
+
+                                                                int summaryTextLength = Convert.ToInt32(currentPage.GetProperty("summaryTextCharacterCount").Value);
+
+                                                                if (introText.Length >= summaryTextLength)
+                                                                {
+                                                                    introText = introText.Substring(0, summaryTextLength);
+                                                                }
+
+                                                                if (introText.Length > 0)
+                                                                {
+                                                                    introText = "<p>" + introText + " ...</p>";
+                                                                }
+                                                            }
+                                                        }
+
+                                                        <div class="item" itemscope itemtype="http://schema.org/BlogPosting">
+                                                            <a href="@node.Url" itemprop="url">
+                                                                @{
+                                                                    string postName = "";
+
+                                                                    if (node.HasValue("onPageTitle"))
+                                                                    {
+                                                                        postName = node.GetProperty("onPageTitle").Value.ToString();
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        postName = node.Name;
+                                                                    }
+                                                                }
+                                                                <p class="heading" itemprop="name headline">
+                                                                    @postName
+                                                                </p>
+                                                            </a>
+                                                            <!-- META -->
+                                                            <div class="meta">
+                                                                <div>
+                                                                    @{
+                                                                        int? authorNodeID = null;
+
+                                                                        if (node.HasValue("postAuthor"))
+                                                                        {
+                                                                            authorNodeID = Convert.ToInt32(node.GetProperty("postAuthor").Value);
+                                                                        }
+                                                                        else if (linkToBlog.LinkUmbracoNode.HasValue("defaultAuthor"))
+                                                                        {
+                                                                            authorNodeID = Convert.ToInt32(linkToBlog.LinkUmbracoNode.GetProperty("defaultAuthor").Value);
+                                                                        }
+
+                                                                        if (authorNodeID != null)
+                                                                        {
+                                                                            var authorNode = Umbraco.TypedContent(Convert.ToInt32(authorNodeID));
+
+                                                                            if(authorNode != null)
+                                                                            { 
+                                                                                LinkInfo authorPage = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(authorNode.GetPropertyValue<UrlPicker>("authorPage"));
+                                                                            
+                                                                                <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+                                                                                    @umbraco.library.GetDictionaryItem("USN Blog Meta Posted By")
+                                                                                    @if (authorPage != null)
+                                                                                    {
+                                                                                        <a itemprop="url" rel="author" href="@authorPage.LinkURL" @Html.Raw(authorPage.LinkTarget) @Html.Raw(authorPage.LinkTitle)>@authorNode.Name@Html.Raw(authorPage.LinkIcon)</a>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        @authorNode.Name
+                                                                                    }
+                                                                                    @umbraco.library.GetDictionaryItem("USN Blog Meta On")
+                                                                                </span>
+                                                                            }
+
+                                                                        }
+                                                                    }
+                                                                    <time itemprop="datePublished" datetime="@node.GetProperty("postDate").Value.ToString().FormatDateTime("yyyy-mm-dd")"><span class="date">@node.GetProperty("postDate").Value.ToString().FormatDateTime("dd MMM yyyy")</span></time>
+                                                                </div>
+                                                            </div>
+                                                            <!--// META -->
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+
+
+                                            if (linkToBlog != null && currentPage.HasValue("pagesToDisplay"))
+                                            {
+                                                <script type="text/javascript">
+                                                    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                                                    var disqus_shortname = '@linkToBlog.LinkUmbracoNode.GetProperty("disqusUsername").Value'; // required: replace example with your forum shortname
+
+                                                    /* * * DON'T EDIT BELOW THIS LINE * * */
+                                                    (function () {
+                                                        var s = document.createElement('script'); s.async = true;
+                                                        s.type = 'text/javascript';
+                                                        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+                                                        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+                                                    }());
+                                                </script>
+                                            }
+
+                                        }
+                                    }
+                                }
+
+
+                                
+                                <!--//  BLOG -->
+
+                            </div>
+
+                            <div class="col-md-12 col-sm-6 col-xs-12">
+
+                                @Html.Partial("USNForms/USN_NewsletterSignup", @Model)
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                   
+
+                </div>
+
+            </div>
+            <!--// ROW -->
+
+        </div>
+    </section>
+
+}

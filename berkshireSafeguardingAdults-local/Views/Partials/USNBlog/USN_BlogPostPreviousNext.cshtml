@@ -1,0 +1,25 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNBlog;
+
+@{
+	// get landing node
+    var landing = USNDataService.Instance.GetLanding(Model.Content);
+
+    var prev = USNPostService.Instance.GetNextPost(Model.Content);
+    var next = USNPostService.Instance.GetPreviousPost(Model.Content);
+
+	<nav id="pager">
+		<ul class="pager nav">
+			@if (prev != null)
+            {
+			<li class="previous"><a href="@prev.Url"><span><i class="fa fa-angle-left"></i>@umbraco.library.GetDictionaryItem("USN Blog Post Navigation Previous")</span></a></li>
+			}
+            <li class="all hidden-xs"><a href="@landing.Url"><span>@umbraco.library.GetDictionaryItem("USN Blog All Posts")</span></a></li>
+			@if (next != null)
+            {
+			<li class="next"><a href="@next.Url"><span>@umbraco.library.GetDictionaryItem("USN Blog Post Navigation Next")<i class="fa fa-angle-right after"></i></span></a></li>
+			}
+		</ul>
+	</nav>
+}

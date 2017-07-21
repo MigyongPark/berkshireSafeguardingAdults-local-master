@@ -1,0 +1,174 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using Newtonsoft.Json.Linq;
+
+@{
+ <!-- COMPONENT ANCHOR -->
+    <a id="pos_@Model.Content.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    int pagesDisplayCount = 0;
+
+    if (Model.Content.HasValue("pagesToDisplay"))
+    {
+        pagesDisplayCount = Convert.ToInt32(Model.Content.GetProperty("pagesToDisplay").Value);
+    }
+
+    var linkToListings = Model.Content.GetPropertyValue<JArray>("linkToListings");
+
+    if (pagesDisplayCount != 0 && (linkToListings != null && Model.Content.GetPropertyValue<string>("linkToListings", true, "").Length > 2))
+    {
+        int listPage = 1;
+
+        string backgroundStyle = "";
+
+        if (Model.Content.HasValue("backgroundColor") && Model.Content.GetProperty("backgroundColor").Value.ToString() == "Grey")
+        {
+            backgroundStyle = "style=\"background-color:#eeeeee\"";
+        }
+
+        <section class="content advanced-component tabbed-listing" @Html.Raw(backgroundStyle)>
+            <div class="container">
+                <!-- ROW -->
+                <div class="row">
+
+                    <div class="tabbed col-xs-12" role="tabpanel">
+
+                        <ul class="nav nav-tabs responsive text-center" role="tablist">
+                            @foreach (JObject link in linkToListings)
+                            {
+                                string linkTitle = String.Empty;
+                                string linkURL = String.Empty;
+                                string linkTarget = String.Empty;
+                                string linkIcon = String.Empty;
+                                IPublishedContent node = null;
+                                
+                                linkURL = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromJObject(link, out linkTitle, out linkTarget, out linkIcon, out node);
+
+                                if (node != null && (node.IsDocumentType("USNStandardPagelevel1") || node.IsDocumentType("USNStandardPagelevel2") || node.IsDocumentType("USNAdvancedPageLevel1") || node.IsDocumentType("USNAdvancedPageLevel2")))
+                                {
+                                    <li role="presentation" @if (listPage == 1) { @Html.Raw("class=\"active\"") }>
+                                        <a href="#tab-name-@Model.Content.Id-@listPage" aria-controls="tab-name-@Model.Content.Id-@listPage" role="tab" data-toggle="tab">
+                                            @(link.Value<string>("caption"))<i class="fa fa-chevron-down pull-right after highlight"></i>
+                                        </a>
+                                    </li>
+                                    listPage += 1;
+                                }
+                            }
+                        </ul>
+
+                        @{listPage = 1;}
+
+                        <div class="tab-content responsive">
+
+                            @foreach (JObject link in linkToListings)
+                            {
+                                string linkTitle = String.Empty;
+                                string linkURL = String.Empty;
+                                string linkTarget = String.Empty;
+                                string linkIcon = String.Empty;
+                                IPublishedContent node = null;
+
+                                linkURL = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromJObject(link, out linkTitle, out linkTarget, out linkIcon, out node);
+
+                                if (node != null && (node.IsDocumentType("USNStandardPagelevel1") || node.IsDocumentType("USNStandardPagelevel2") || node.IsDocumentType("USNAdvancedPageLevel1") || node.IsDocumentType("USNAdvancedPageLevel2")))
+                                {
+                                    string pageName = "";
+
+                                    if (node.HasValue("subNavigationLinkText"))
+                                    {
+                                        pageName = node.GetProperty("subNavigationLinkText").Value.ToString();
+                                    }
+                                    else
+                                    {
+                                        pageName = @node.Name;
+                                    }
+                                    <div id="tab-name-@Model.Content.Id-@listPage" role="tabpanel" class="tab-pane @if(listPage == 1){@Html.Raw("active")}">
+                                        @if (node.Children.Where(x => x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")).Count() > 0)
+                                        {
+                                            <!-- LISTING -->
+                                            <div class="row listing section grid">
+                                                @foreach (var subPage in node.Children.Where(x => x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")).OrderBy("SortOrder").Take(pagesDisplayCount))
+                                                {
+                                                    string introText = "";
+
+                                                    if (subPage.HasValue("pageSummary"))
+                                                    {
+                                                        introText = subPage.GetProperty("pageSummary").Value.ToString();
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model.Content.HasValue("summaryTextCharacterCount"))
+                                                        {
+                                                            int summaryTextLength = Convert.ToInt32(Model.Content.GetProperty("summaryTextCharacterCount").Value);
+
+                                                            if (summaryTextLength > 0 && subPage.HasProperty("bodyText"))
+                                                            {
+                                                                introText = subPage.GetProperty("bodyText").Value.ToString().StripHtml().Trim();
+
+                                                                if (introText.Length >= summaryTextLength)
+                                                                {
+                                                                    introText = introText.Substring(0, summaryTextLength);
+                                                                }
+
+                                                                if (introText.Length > 0)
+                                                                {
+                                                                    introText = "<p>" + introText + " ...</p>";
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    <!-- ITEM -->
+                                                    <div class="item col-md-3 col-xs-6">
+
+                                                        @if (subPage.HasValue("pageListingImage") && Umbraco.TypedMedia(subPage.GetProperty("pageListingImage").Value) != null)
+                                                        {
+                                                            <div class="image">
+                                                                <a href="@subPage.Url">
+                                                                    <img src="@Umbraco.TypedMedia(subPage.GetProperty("pageListingImage").Value).GetCropUrl(width: 345, height: 260)" alt="@subPage.GetProperty("pageListingImageAltText").Value">
+                                                                </a>
+                                                            </div>
+                                                        }
+                                                        <div class="info">
+                                                            <p class="heading">
+                                                                <a href="@subPage.Url">
+                                                                    @if (subPage.HasValue("subPageListingLinkText"))
+                                                                    {
+                                                                        @subPage.GetProperty("subPageListingLinkText").Value.ToString()
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @subPage.Name
+                                                                    }
+                                                                </a>
+                                                            </p>
+                                                            @if (introText != String.Empty)
+                                                            {
+                                                                <div class="text">
+                                                                    @Html.Raw(introText)
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                <!--// ITEM -->
+                                                }
+                                            </div>
+                                            <!--// LISTING  -->
+
+                                            <p class="link text-center"><a class="btn btn-default" href="@linkURL" @Html.Raw(linkTarget) @Html.Raw(linkTitle)>@(link.Value<string>("caption"))@Html.Raw(linkIcon)</a></p>
+                                        }
+                                    </div>
+
+                                    listPage += 1;
+                                }
+                            }
+                        </div>
+
+                    </div>
+                </div>
+                <!--// ROW -->
+            </div>
+        </section>
+    }
+}

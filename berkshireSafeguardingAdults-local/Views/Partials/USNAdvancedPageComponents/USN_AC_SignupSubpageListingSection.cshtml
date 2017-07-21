@@ -1,0 +1,245 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<USNStarterKit.USNModels.USNNewsletterFormViewModel>
+
+@using USNStarterKit.USNBlog;
+@using USNStarterKit.USNUrlPicker.Models;
+@using USNStarterKit.USNHeading.Models;
+
+@{
+    var currentPage = Umbraco.TypedContent(Model.CurrentNodeID);
+
+    string backgroundStyle = "";
+    string firstDivClass = "col-md-6 col-xs-12 pull-right";
+    string secondDivClass = "col-md-5 col-xs-12 pull-left";
+
+    if (currentPage.HasValue("backgroundColor") && currentPage.GetProperty("backgroundColor").Value.ToString() == "Grey")
+    {
+        backgroundStyle = "style=\"background-color:#eeeeee\"";
+    }
+
+    if (currentPage.HasValue("newsletterSectionPosition") && currentPage.GetProperty("newsletterSectionPosition").Value.ToString() == "Right")
+    {
+        firstDivClass = "col-md-6 col-xs-12 pull-left";
+        secondDivClass = "col-md-5 col-xs-12 pull-right";
+    }
+
+     <!-- COMPONENT ANCHOR -->
+    <a id="pos_@currentPage.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    <section class="content advanced-component blog-with-form" @Html.Raw(backgroundStyle)>
+        <div class="container">
+
+            <!-- ROW -->
+            <div class="row">
+
+                <div class="@firstDivClass">
+
+                    <!-- LISTING - BLOG -->
+                    @{
+                        LinkInfo linkToListing = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(currentPage.GetPropertyValue<UrlPicker>("linkToListing"));
+
+
+                        if (linkToListing != null && currentPage.HasValue("pagesToDisplay"))
+                        {
+                            int pagesDisplayCount = Convert.ToInt32(currentPage.GetProperty("pagesToDisplay").Value);
+
+                            if (linkToListing.LinkUmbracoNode.IsDocumentType("USNBlogLandingPage"))
+                            {
+                                IEnumerable<IPublishedContent> posts = USNPostService.Instance.GetPosts(linkToListing.LinkUmbracoNode);
+
+                                var nodes = posts.Take(pagesDisplayCount).ToList();
+
+                                if (nodes.Count() > 0)
+                                {
+                                    <div class="listing blog">
+                                                                                
+                                        @if (currentPage.HasValue("listingSectionHeading"))
+                                        {
+                                            var listingSectionHeading = currentPage.GetPropertyValue<USNHeading>("listingSectionHeading");
+
+                                            if (listingSectionHeading != null && !String.IsNullOrEmpty(listingSectionHeading.Heading))
+                                            {
+                                                @Html.Raw("<" + listingSectionHeading.HeadingStyle + " class=\"heading main\"><span class=\"underline\">")
+                                                @listingSectionHeading.Heading
+                                                @Html.Raw("</span></" + listingSectionHeading.HeadingStyle + ">")
+                                            }
+                                        }
+                                        
+                                        @foreach (var node in nodes)
+                                        {
+                                            Boolean displaySummaryText = false;
+                                            string introText = "";
+
+                                            if (node.HasValue("postSummary"))
+                                            {
+                                                introText = node.GetProperty("postSummary").Value.ToString();
+                                                displaySummaryText = true;
+                                            }
+                                            else
+                                            {
+                                                if (currentPage.HasValue("summaryTextCharacterCount"))
+                                                {
+                                                    introText = library.StripHtml(node.GetProperty("bodyText").Value.ToString());
+
+                                                    displaySummaryText = true;
+
+                                                    int summaryTextLength = Convert.ToInt32(currentPage.GetProperty("summaryTextCharacterCount").Value);
+
+                                                    if (introText.Length >= summaryTextLength)
+                                                    {
+                                                        introText = introText.Substring(0, summaryTextLength);
+                                                    }
+
+                                                    if (introText.Length > 0)
+                                                    {
+                                                        introText = "<p>" + introText + " ...</p>";
+                                                    }
+                                                }
+                                            }
+
+                                            <div class="item" itemscope itemtype="http://schema.org/BlogPosting">
+                                                <div class="info">
+                                                    <a href="@node.Url" itemprop="url">
+                                                        @{
+
+                                                            string postName = "";
+
+                                                            if (node.HasValue("onPageTitle"))
+                                                            {
+                                                                postName = node.GetProperty("onPageTitle").Value.ToString();
+                                                            }
+                                                            else
+                                                            {
+                                                                postName = node.Name;
+                                                            }
+                                                        }
+                                                        <p class="heading" itemprop="name headline">
+                                                            @postName
+                                                        </p>
+                                                    </a>
+                                                    @if (displaySummaryText)
+                                                    {
+                                                        <div class="text" itemprop="articleBody">@Html.Raw(introText)</div>
+                                                    }
+                                                </div>
+                                                @Html.Partial("USNBlog/USN_BlogMeta", @node)
+                                            </div>
+                                        }
+                                        <a class="btn btn-primary" href="@linkToListing.LinkURL" @Html.Raw(linkToListing.LinkTarget) @Html.Raw(linkToListing.LinkTitle)>@linkToListing.LinkCaption@Html.Raw(linkToListing.LinkIcon)</a>
+                                    </div>
+                                }
+
+
+                                if (linkToListing != null && currentPage.HasValue("pagesToDisplay"))
+                                {
+                                    <script type="text/javascript">
+                                        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                                        var disqus_shortname = '@linkToListing.LinkUmbracoNode.GetProperty("disqusUsername").Value'; // required: replace example with your forum shortname
+
+                                        /* * * DON'T EDIT BELOW THIS LINE * * */
+                                        (function () {
+                                            var s = document.createElement('script'); s.async = true;
+                                            s.type = 'text/javascript';
+                                            s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+                                            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+                                        }());
+                                    </script>
+                                }
+
+                            }
+                            else if (linkToListing.LinkUmbracoNode.Children.Where(x => x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")).Count() > 0)
+                            {
+                                <div class="listing section">
+                                    @if (currentPage.HasValue("listingSectionHeading"))
+                                    {
+                                        var listingSectionHeading = currentPage.GetPropertyValue<USNHeading>("listingSectionHeading");
+
+                                        if (listingSectionHeading != null && !String.IsNullOrEmpty(listingSectionHeading.Heading))
+                                        {
+                                            @Html.Raw("<" + listingSectionHeading.HeadingStyle + " class=\"heading main\"><span class=\"underline\">")
+                                            @listingSectionHeading.Heading
+                                            @Html.Raw("</span></" + listingSectionHeading.HeadingStyle + ">")
+                                        }
+                                    }
+                                   
+                                    @foreach (var item in linkToListing.LinkUmbracoNode.Children.Where(x => x.IsDocumentType("USNStandardPagelevel2") || x.IsDocumentType("USNStandardPagelevel3") || x.IsDocumentType("USNAdvancedPageLevel2") || x.IsDocumentType("USNAdvancedPageLevel3")).OrderBy("SortOrder").Take(pagesDisplayCount))
+                                    {
+                                        Boolean displaySummaryText = false;
+                                        string introText = "";
+
+                                        if (item.HasValue("pageSummary"))
+                                        {
+                                            introText = item.GetProperty("pageSummary").Value.ToString();
+                                            displaySummaryText = true;
+                                        }
+                                        else
+                                        {
+                                            if (currentPage.HasValue("summaryTextCharacterCount"))
+                                            {
+                                                int summaryTextLength = Convert.ToInt32(currentPage.GetProperty("summaryTextCharacterCount").Value);
+
+                                                if (summaryTextLength > 0)
+                                                {
+                                                    introText = item.GetProperty("bodyText").Value.ToString().StripHtml().Trim();
+
+                                                    displaySummaryText = true;
+
+                                                    if (introText.Length >= summaryTextLength)
+                                                    {
+                                                        introText = introText.Substring(0, summaryTextLength);
+                                                    }
+
+                                                    if (introText.Length > 0)
+                                                    {
+                                                        introText = "<p>" + introText + " ...</p>";
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        <div class="item">
+                                            <div class="info">
+                                                <a href="@item.Url">
+                                                    <p class="heading">
+                                                        @if (item.HasValue("subPageListingLinkText"))
+                                                        {
+                                                            @item.GetProperty("subPageListingLinkText").Value.ToString()
+                                                        }
+                                                        else
+                                                        {
+                                                            @item.Name
+                                                        }
+                                                    </p>
+                                                </a>
+
+                                                @if (displaySummaryText && introText != String.Empty)
+                                                {
+                                                    <div class="text">@Html.Raw(introText)</div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    }
+                                    <a class="see_all" href="@linkToListing.LinkURL" @Html.Raw(linkToListing.LinkTarget) @Html.Raw(linkToListing.LinkTitle)>@linkToListing.LinkCaption@Html.Raw(linkToListing.LinkIcon)</a>
+                                </div>
+                            }
+                        }
+                    }
+
+                    <!--// LISTING - BLOG -->
+
+                </div>
+
+                <div class="@secondDivClass">
+
+                    @Html.Partial("USNForms/USN_NewsletterSignup", @Model)
+
+                </div>
+
+            </div>
+            <!--// ROW -->
+
+        </div>
+    </section>
+
+}

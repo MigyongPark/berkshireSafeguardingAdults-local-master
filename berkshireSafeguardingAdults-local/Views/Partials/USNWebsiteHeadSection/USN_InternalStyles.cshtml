@@ -1,0 +1,51 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@{
+    IPublishedContent homeNode = Model.Content.AncestorOrSelf(1);
+    var settingsFolder = Umbraco.TypedContent(homeNode.GetProperty("websiteConfigurationNode").Value);
+    var globalSettings = settingsFolder.Children.Where(x => x.IsDocumentType("USNGlobalSettings")).First();
+
+
+    if (globalSettings.HasValue("websiteLogo") && Umbraco.TypedMedia(globalSettings.GetProperty("websiteLogo").Value) != null)
+    {
+        var websiteLogo = Umbraco.TypedMedia(globalSettings.GetProperty("websiteLogo").Value);
+
+        int originalWidth = websiteLogo.GetPropertyValue<int>("umbracoWidth");
+        int originalHeight = websiteLogo.GetPropertyValue<int>("umbracoHeight");
+        int smallWidth = originalWidth;
+        int smallHeight = originalHeight;
+
+        if (originalHeight > 23)
+        {
+            //get new width
+            smallWidth = (23 * originalWidth) / originalHeight;
+            smallHeight = 23;
+        }
+
+        string smallLogo = websiteLogo.Url + "?width=" + smallWidth + "&height=" + smallHeight;
+        string retinaLogo = websiteLogo.Url + "?width=" + smallWidth + "&height=" + smallHeight;
+        
+    <style>
+
+        header #logo a {
+			text-indent:-9999px;
+            width: @Html.Raw(smallWidth)px;
+            height: @Html.Raw(smallHeight)px;
+            background-image: url('@smallLogo');
+        }
+
+        @@media (max-width:767px) {
+            header #logo a {
+                background-image: url('@smallLogo');
+            }
+        }
+
+        @@media only screen and (-webkit-min-device-pixel-ratio : 1.5), only screen and (min-device-pixel-ratio : 1.5), only screen and (-webkit-min-device-pixel-ratio : 2), only screen and (min-device-pixel-ratio : 2) {
+            header #logo a {
+                background-image: url('@websiteLogo.Url');
+                background-size: @Html.Raw(smallWidth)px @Html.Raw(smallHeight)px;
+            }
+        }
+    </style>
+    }
+}

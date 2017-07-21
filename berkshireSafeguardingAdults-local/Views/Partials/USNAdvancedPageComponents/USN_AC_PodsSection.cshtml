@@ -1,0 +1,69 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+    <!-- COMPONENT ANCHOR -->
+    <a id="pos_@Model.Content.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    int totalCount = Model.Content.Children.Where(x => x.IsDocumentType("USN_AC_Pod")).Count();
+
+    if (totalCount > 0)
+    {
+        string backgroundStyle = "";
+
+        if (Model.Content.HasValue("backgroundColor") && Model.Content.GetProperty("backgroundColor").Value.ToString() == "Grey")
+        {
+            backgroundStyle = "style=\"background-color:#eeeeee\"";
+        }
+
+
+        <section class="content advanced-component promo_pods" @Html.Raw(backgroundStyle)>
+            <div class="container">
+                <div class="row">
+                    @foreach (var pod in Model.Content.Children.Where(x => x.IsDocumentType("USN_AC_Pod")))
+                    {
+                        LinkInfo podLink = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(pod.GetPropertyValue<UrlPicker>("podLink"));
+                        
+                        
+                        <div class="item col-md-4 col-xs-6">
+                            @if (podLink != null)
+                            {
+                                @Html.Raw("<a href=\"" + podLink.LinkURL + "\" " + podLink.LinkTitle + " " + podLink.LinkTarget + ">")
+                            }
+
+                            @if (pod.HasValue("podImage") && Umbraco.TypedMedia(pod.GetProperty("podImage").Value) != null)
+                            {
+                                <div class="image">
+                                    <img src="@Umbraco.TypedMedia(pod.GetProperty("podImage").Value).GetCropUrl(width: 345, height: 260)" alt="@pod.GetProperty("podImageAltText").Value">
+                                </div>
+                            }
+
+                            @if (pod.HasValue("podTitle"))
+                            {
+                                <p class="heading">@pod.GetProperty("podTitle").Value</p>
+                            }
+
+                            @if (podLink != null)
+                            {
+                                @Html.Raw("</a>")
+                            }
+
+                            @if (pod.HasValue("podText"))
+                            {
+                                <div class="info">
+                                    <div class="text">@Html.Raw(pod.GetProperty("podText").Value.ToString())</div>
+                                </div>
+                            }
+                            @if (podLink != null)
+                            {
+                                @*<p class="link"><a role="button" class="btn btn-primary" href="@podLink.LinkURL" @Html.Raw(podLink.LinkTarget) @Html.Raw(podLink.LinkTitle)>@podLink.LinkCaption@Html.Raw(podLink.LinkIcon)</a></p>*@
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+}

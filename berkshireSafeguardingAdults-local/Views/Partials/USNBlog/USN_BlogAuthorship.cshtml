@@ -1,0 +1,54 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNBlog;
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+    // get landing node
+    var landing = USNDataService.Instance.GetLanding(Model.Content);
+	
+    int? authorNodeID = null;
+
+    if (Model.Content.HasValue("postAuthor"))
+    {
+        authorNodeID = Convert.ToInt32(Model.Content.GetProperty("postAuthor").Value);
+    }
+    else if (landing.HasValue("defaultAuthor"))
+    {
+        authorNodeID = Convert.ToInt32(landing.GetProperty("defaultAuthor").Value);
+    }
+
+    if (authorNodeID != null)
+    {
+        var authorNode = Umbraco.TypedContent(Convert.ToInt32(authorNodeID));
+
+        if (authorNode.HasValue("authorBio"))
+        {
+            LinkInfo authorPage = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(authorNode.GetPropertyValue<UrlPicker>("authorPage"));
+            
+			<!-- PAGE COMPONENT AUTHOR BIO -->
+            <div class="page_component author_bio panel panel-default">
+                <div class="panel-body">
+                    <p class="heading">@umbraco.library.GetDictionaryItem("USN Blog About The Author")</p>
+                    <div class="info">
+                        <p class="heading" itemtype="http://schema.org/Person" itemscope="itemscope" itemprop="author">
+                            @if (authorPage != null)
+                            {
+                                <a href="@authorPage.LinkURL" itemprop="url" rel="author" @Html.Raw(authorPage.LinkTarget) @Html.Raw(authorPage.LinkTitle)>@authorNode.Name@Html.Raw(authorPage.LinkIcon)</a>
+                            }
+                            else
+                            {
+                                @authorNode.Name
+                            }
+                        </p>
+                        <div class="text">
+                            @Html.Raw(authorNode.GetProperty("authorBio").Value)
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<!--// PAGE COMPONENT AUTHOR BIO -->
+					
+        }		
+    }
+}

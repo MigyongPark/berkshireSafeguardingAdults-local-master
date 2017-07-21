@@ -1,0 +1,77 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+    string pageType = ViewData["pageType"].ToString();
+    
+    if (Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_ListItem")).Count() > 0)
+    {
+        <!-- COMPONENT ANCHOR -->
+        <a id="pos_@Model.Content.Id"></a>
+        <!--// COMPONENT ANCHOR -->
+    
+        @* Add container for page components on advanced page *@
+        if (pageType == "advanced")
+        {
+        @Html.Raw("<section class=\"content advanced-component standard-components\"><div class=\"container\"><div class=\"row\"><div id=\"mid_col\" class=\"col-md-8 col-md-offset-2 col-xs-12\" role=\"main\">")
+        }
+    
+		<!-- PAGE COMPONENT LISTING SECTION -->
+        <div class="page_component listing ">
+
+            @foreach (var item in Model.Content.Children.Where(x => x.IsDocumentType("USN_SC_ListItem")).OrderBy("SortOrder"))
+            {
+                LinkInfo listItemLink = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(item.GetPropertyValue<UrlPicker>("listItemLink"));
+                
+                <div class="item row">
+                   
+                    @if (item.HasValue("listItemImage") && Umbraco.TypedMedia(item.GetProperty("listItemImage").Value) != null)
+                    {
+                        <div class="col-sm-4 pull-right col-xs-12 text-right">
+                            <div class="image">
+                                @if (listItemLink != null)
+                                {
+                                    @Html.Raw("<a href=\"" + listItemLink.LinkURL + "\" " + listItemLink.LinkTitle + " " + listItemLink.LinkTarget + ">")
+                                }
+                                <img src="@Umbraco.TypedMedia(item.GetProperty("listItemImage").Value).GetCropUrl(width: 345, height: 260)" alt="@item.GetProperty("listItemImageAltText").Value">
+                                @if (listItemLink != null)
+                                {
+                                    @Html.Raw("</a>")
+                                }
+                            </div>
+                        </div>
+                    }
+                    <div class="info col-sm-8 pull-left col-xs-12">
+                        <p class="heading">
+                            @if (listItemLink != null)
+                            {
+                                @Html.Raw("<a href=\"" + listItemLink.LinkURL + "\" " + listItemLink.LinkTitle + " " + listItemLink.LinkTarget + ">")
+                            }
+                            @item.Name@Html.Raw(listItemLink != null ? listItemLink.LinkIcon : "")
+                            @if (listItemLink != null)
+                            {
+                                @Html.Raw("</a>")
+                            }
+                        </p>
+
+                        @if (item.HasValue("listItemText"))
+                        {
+                            <div class="text">@Html.Raw(item.GetProperty("listItemText").Value)</div>
+                        }
+                    </div>
+                  
+                </div>
+            }
+
+        </div>
+    
+        @* Close container for page components on advanced page *@
+        if (pageType == "advanced")
+        {
+            @Html.Raw("</div></div></div></section>")
+        }
+    
+    }
+	<!--// PAGE COMPONENT LISTING SECTION -->
+}

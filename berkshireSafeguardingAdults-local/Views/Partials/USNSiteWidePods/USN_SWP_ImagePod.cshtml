@@ -1,0 +1,81 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNUrlPicker.Models;
+
+@{
+
+    string podStyle = ViewData["podstyle"].ToString();
+
+    if (podStyle == "horizontal")
+    {
+        @Html.Raw("<div class=\"col-lg-3 col-md-4 col-sm-6 col-xs-12\">");
+    }
+
+    string lightWindow = "";
+    string title = "";
+
+    if (!Model.Content.GetPropertyValue<bool>("tickToDisableLightWindow"))
+    {
+        lightWindow = " data-toggle=\"lightbox\" data-type=\"image\" ";
+
+        if (Model.Content.HasValue("lightwindowText"))
+        {
+            title = "data-title=\"" + Model.Content.GetProperty("lightwindowText").Value.ToString() + "\"";
+        }
+    }
+
+    if (Model.Content.HasValue("lightWindowImage") && Umbraco.TypedMedia(Model.Content.GetProperty("lightWindowImage").Value) != null)
+    {
+        string linkURL = String.Empty;
+        string linkTitle = String.Empty;
+        string linkTarget = String.Empty;
+
+        if (Model.Content.GetPropertyValue<bool>("tickToDisableLightWindow") && Model.Content.HasValue("imageLink"))
+        {
+            LinkInfo imageLink = USNStarterKit.USNHelpers.USNUrlHelper.GetSingleUrlFromUrlPicker(Model.Content.GetPropertyValue<UrlPicker>("imageLink"));
+            
+            if(imageLink != null)
+            { 
+                linkURL = imageLink.LinkURL;
+                linkTitle = imageLink.LinkTitle;
+                linkTarget = imageLink.LinkTarget;
+            } 
+        }
+        else
+        {
+            linkURL = Umbraco.TypedMedia(Model.Content.GetProperty("lightWindowImage").Value).Url;
+        }
+
+        <div class="item imagepod">
+            <div class="image">
+                @if (linkURL != String.Empty)
+                {
+                    @Html.Raw("<a href=\"" + linkURL + "\" " + title + " target=\"" + linkTarget + "\" " + lightWindow + " >")
+                }
+                <img src="@Umbraco.TypedMedia(Model.Content.GetProperty("lightWindowImage").Value).GetCropUrl(width: 345, height: 260)" alt="@Model.Content.GetProperty("thumbnailImageAltText").Value">
+                @if (lightWindow != String.Empty)
+                {
+                    <div class="overlayicon"><i class="fa fa-expand"></i></div>
+                }
+                else if (linkURL != String.Empty && linkTarget != String.Empty)
+                {
+                    <div class="overlayicon"><i class="fa fa-external-link"></i></div>
+                }
+                else if (linkURL != String.Empty && linkTarget == String.Empty)
+                {
+                    <div class="overlayicon"><i class="fa fa fa-chain"></i></div>
+                }
+                @if (linkURL != String.Empty)
+                {
+                    @Html.Raw("</a>")
+                }
+            </div>
+        </div>
+
+    }
+
+    if (podStyle == "horizontal")
+    {
+        @Html.Raw("</div>");
+    }
+}

@@ -1,0 +1,320 @@
+/* 	--------------------------------------------------    uSkinned.net	BASE    -------------------------------------------------- */
+/* 	--------------------------------------------------    TABLE OF CONTENTS     -------------------------------------------------- 	1.0 LINKS	2.0 LISTS	3.0 MISC	4.0 TYPOGRAPHY	*/
+/*		BOOTSTRAP BREAKPOINTS		.col-xs-	< 768px		(container width 100%)	.col-sm-	> 768px		(container width 750px)	.col-md-	> 992px		(container width 970px)	.col-lg-	> 1200px	(container width 1170px)	*/
+/*	--------------------------------------------------	1.0 LINKS	-------------------------------------------------- */
+
+a,
+.slick-prev,
+.slick-next {} a,
+.btn,
+.slick-prev,
+.slick-next {
+    -webkit-transition: all 0.2s ease-in-out 0s;
+    -moz-transition: all 0.2s ease-in-out 0s;
+    -ms-transition: all 0.2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
+}
+a:hover {
+    text-decoration: none;
+}
+.btn {
+    border-radius: 0;
+}
+a.see_all {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 11px;
+}
+#top-link-block {
+    z-index: 200;
+    position: relative;
+}
+#top-link-block a {
+    display: block;
+    margin: 0 auto;
+    border-radius: 0;
+    border: 0 none;
+    box-shadow: 0;
+}
+@media (max-width: 991px) {
+    #top-link-block a {
+        text-align: center;
+        border-radius: 0;
+        border: 0 none;
+        box-shadow: 0 none;
+    }
+}
+@media (min-width: 992px) {
+    #top-link-block {
+        position: fixed;
+        bottom: 25px;
+        right: 15px;
+        padding: 0;
+        -webkit-opacity: 0;
+        -moz-opacity: 0;
+        -ms-opacity: 0;
+        opacity: 0;
+        -webkit-transition: opacity 0.2s ease-in-out 0s;
+        -moz-transition: opacity 0.2s ease-in-out 0s;
+        -ms-transition: opacity 0.2s ease-in-out 0s;
+        transition: opacity 0.2s ease-in-out 0s;
+    }
+    #top-link-block.affix.show {
+        -webkit-opacity: 1;
+        -moz-opacity: 1;
+        -ms-opacity: 1;
+        opacity: 1;
+    }
+    .listing a .heading {
+        -webkit-opacity: 1;
+        -moz-opacity: 1;
+        -ms-opacity: 1;
+        opacity: 1;
+        -webkit-transition: opacity 0.2s ease-in-out 0s;
+        -moz-transition: opacity 0.2s ease-in-out 0s;
+        -ms-transition: opacity 0.2s ease-in-out 0s;
+        transition: opacity 0.2s ease-in-out 0s;
+    }
+    .listing a .heading:hover {
+        -webkit-opacity: 0.8;
+        -moz-opacity: 0.8;
+        -ms-opacity: 0.8;
+        opacity: 0.8;
+    }
+}
+/*	--------------------------------------------------	2.0 LISTS	-------------------------------------------------- */
+
+ul,
+ol {
+    padding: 0;
+    margin: 0 0 16px;
+    line-height: 1.4;
+}
+ul {
+    margin-left: 20px;
+    list-style: disc outside;
+}
+ol {
+    margin-left: 22px;
+    list-style: decimal;
+}
+ul ul,
+ol ol {
+    padding: 4px 0 0 8px;
+}
+ul ul {
+    list-style: circle outside;
+}
+ol ol {
+    list-style: lower-roman;
+}
+li {
+    margin-bottom: 4px;
+}
+dl {} dl dt {
+    font-weight: bold;
+    padding-bottom: 2px;
+}
+dl dd {
+    padding-bottom: 4px;
+}
+ul.nav,
+ol.nav,
+nav ul,
+nav ol,
+ul.list,
+ol.list,
+nav ul li,
+nav ol li,
+ul.list li,
+ol.list li,
+ul.slick-dots,
+ul.slick-dots li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    line-height: 1;
+}
+/* 	-------------------------------------------------- 	3.0 MISC	-------------------------------------------------- */
+
+img {
+    width: 100%;
+    height: auto;
+}
+/* IMAGE TRANSITIONS */
+
+.image.video,
+.promo_pods .image,
+.listing .image,
+.gallery .image {
+    overflow: hidden;
+    padding: 0;
+}
+.image.video a img,
+.promo_pods img,
+.listing img,
+.gallery img {
+    display: block;
+    overflow: hidden;
+}
+.image.video a img,
+.promo_pods a img,
+.listing a img,
+.gallery a img {
+    -webkit-transition: transform 0.2s ease-in-out;
+    -moz-transition: transform 0.2s ease-in-out;
+    -ms-transition: transform 0.2s ease-in-out;
+    -o-transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out;
+}
+@media (max-width: 767px) {
+    .author_bio img,
+    .listing img {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+    }
+}
+@media (min-width: 768px) {
+    .promo_pods img,
+    .listing img,
+    .gallery img {
+        width: 100%;
+        height: auto;
+    }
+}
+@media (min-width: 992px) {
+    .image.video a:hover img,
+    .promo_pods a:hover img,
+    .listing a:hover img,
+    .gallery a:hover img {
+        -webkit-transform: scale(1.3);
+        -moz-transform: scale(1.3);
+        -ms-transform: scale(1.3);
+        -o-transform: scale(1.3);
+        transform: scale(1.3);
+    }
+}
+i.fa {
+    margin-right: 5px;
+}
+i.fa.after {
+    margin-right: 0;
+    margin-left: 5px;
+}
+.text-center i.fa {
+    margin-right: 0;
+    margin-left: 0;
+}
+#pagination.text-center i.fa {
+    margin-right: 5px;
+}
+#pagination.text-center i.fa.after {
+    margin-right: 0;
+    margin-left: 5px;
+}
+.glyphicon.lg {
+    font-size: 40px;
+}
+@media (max-width: 767px) {
+    .text-left-xs {
+        text-align: left;
+    }
+}
+/*	--------------------------------------------------	4.0 TYPOGRAPHY	-------------------------------------------------- */
+/*	--------------------------------------------------	font-family: 	'Helvetica Neue'	font-weight:		-------------------------------------------------- */
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+}
+input,
+select,
+textarea,
+button,
+blockquote cite {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 15px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.heading,
+nav.main,
+nav.top,
+nav,
+ul.nav,
+thead,
+blockquote {
+    font-family: "Open Sans";
+}
+h1 {
+    font-size: 36px;
+}
+h2 {
+    font-size: 32px;
+}
+h3 {
+    font-size: 30px;
+}
+h4 {
+    font-size: 24px;
+}
+h5,
+.heading {
+    font-size: 20px;
+}
+h6 {
+    font-size: 16px;
+}
+h1,
+h2,
+h3 {
+    margin-top: 16px 0;
+}
+#left_col h1:first-child,
+#right_col h1:first-child,
+#wide_col h1:first-child,
+#mid_col h1:first-child {
+    margin-top: 0;
+}
+h4,
+h5,
+h6,
+p.heading {
+    margin-top: 8px 0;
+}
+.advanced-component .heading {
+    font-size: 24px;
+    line-height: 1.2;
+    margin: 8px 0 16px;
+}
+footer p.heading {
+    font-size: 18px;
+    margin-bottom: 16px;
+}
+.heading span.underline {
+    line-height: 1.4;
+    border-width: 0 0 1px;
+    /*border-style: solid;*/
+}
+p {
+    margin: 8px 0 16px;
+}
+p,
+.text {
+    line-height: 1.4;
+}
+.intro {
+    font-size: 18px;
+}
+p#skip {
+    display: none;
+}
+@media (min-width: 768px) {} @media (min-width: 992px) {} @media (min-width: 1200px) {}
+/*	--------------------------------------------------	END	-------------------------------------------------- */

@@ -1,0 +1,108 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using USNStarterKit.USNHelpers;
+@using USNStarterKit.USNHeading.Models;
+
+@{
+    <!-- COMPONENT ANCHOR -->
+    <a id="pos_@Model.Content.Id"></a>
+    <!--// COMPONENT ANCHOR -->
+
+    string backgroundStyle = "";
+    string firstDivClass = "col-md-5 col-xs-12 pull-left";
+    string secondDivClass = "col-md-6 col-xs-12 pull-right";
+    string title = "";
+
+    if (Model.Content.HasValue("backgroundColor") && Model.Content.GetProperty("backgroundColor").Value.ToString() == "Grey")
+    {
+        backgroundStyle = "style=\"background-color:#eeeeee\"";
+    }
+    if (Model.Content.HasValue("textSectionPosition") && Model.Content.GetProperty("textSectionPosition").Value.ToString() == "Right")
+    {
+        firstDivClass = "col-md-5 col-xs-12 pull-right";
+        secondDivClass = "col-md-6 col-xs-12 pull-left";
+    }
+
+    string image = "";
+    string videoURLModified = "";
+    string dataRemote = "";
+
+    if (Model.Content.HasValue("video"))
+    {
+        string videoURLOriginal = Model.Content.GetProperty("video").Value.ToString().Trim();
+
+        if (Model.Content.HasValue("lightwindowText"))
+        {
+            title = "data-title=\"" + Model.Content.GetProperty("lightwindowText").Value.ToString() + "\"";
+        }
+
+        image = USNVideoHelper.GetVideoInfo(videoURLOriginal, out videoURLModified, out dataRemote);
+    }
+
+    if (Model.Content.HasValue("image") && Umbraco.TypedMedia(Model.Content.GetProperty("image").Value) != null)
+    {
+        image = @Umbraco.TypedMedia(Model.Content.GetProperty("image").Value).GetCropUrl(width: 720, height: 495);
+    }
+    
+
+    <section class="content advanced-component text-with-image_video" @Html.Raw(backgroundStyle)>
+        <div class="container">
+
+            <!-- ROW -->
+            <div class="row">
+
+                <div class="@firstDivClass">
+
+                    <!-- INFO -->
+                    <div class="info">
+                        
+                        @if (Model.Content.HasValue("heading"))
+                        {
+                            var heading = Model.Content.GetPropertyValue<USNHeading>("heading");
+
+                            if (heading != null && !String.IsNullOrEmpty(heading.Heading))
+                            {
+                                @Html.Raw("<" + heading.HeadingStyle + " class=\"heading main\"><span class=\"underline\">")
+                                @heading.Heading
+                                @Html.Raw("</span></" + heading.HeadingStyle + ">")
+                            }
+                        }
+
+                        @if (Model.Content.HasValue("text"))
+                        {
+                            @Html.Raw(Model.Content.GetProperty("text").Value)
+                        }
+                    </div>
+                    <!--// INFO -->
+
+                </div>
+
+                <div class="@secondDivClass">
+
+                    @if(image != String.Empty)
+                    { 
+                    <div class="image video">
+                        @if(videoURLModified != String.Empty)
+                        {
+                            @Html.Raw(String.Format("<a href=\"{0}\" {1} data-toggle=\"lightbox\" {2}>",videoURLModified,title,dataRemote))
+                        }
+                        
+                        <img alt="@Model.Content.GetProperty("imageAltText").Value" src="@image">
+                           
+                        @if (videoURLModified != String.Empty)
+                        {
+                            @Html.Raw("<div class=\"overlayicon\"><i class=\"fa fa-play fa-3x\"></i></div></a>")
+                        }
+                    </div>
+                    }
+
+                </div>
+
+
+            </div>
+            <!--// ROW -->
+
+        </div>
+    </section>
+
+}
